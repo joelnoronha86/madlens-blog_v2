@@ -1,0 +1,145 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FieldSpecimenCard from '../../components/FieldSpecimenCard.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  // Only published posts are rendered on public /posts routes
+  const posts = await getCollection('posts', ({ data }) => {
+    return data.draft !== true;
+  });
+  return posts.map((post) => ({
+    params: { slug: post.id.replace(/\.md$/, '') },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { data } = post;
+const { Content } = await render(post);
+
+const formattedDate = new Intl.DateTimeFormat('en-US', {
+  month: 'long',
+  year: 'numeric',
+}).format(data.pubDate);
+---
+
+<BaseLayout
+  title={`${data.title} | Geographies of Natural Dyes`}
+  description={data.excerpt}
+  image={data.coverImage}
+>
+  <article class="py-12 bg-parchment-base">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Article Header & Metadata -->
+      <header class="max-w-4xl mb-10">
+        <!-- Issue & Classification -->
+        <div class="flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-sage-botanical mb-4">
+          <span class="font-bold text-madder-red">{data.issue}</span>
+          <span>&bull;</span>
+          <span>DISPATCH #{post.id.slice(0, 4).toUpperCase()}</span>
+          {data.draft && (
+            <span class="px-2 py-0.5 rounded bg-madder-red text-parchment-light font-bold text-[10px]">
+              DRAFT PREVIEW
+            </span>
+          )}
+        </div>
+
+        <!-- Main Title -->
+        <h1 class="font-heading text-4xl sm:text-5xl md:text-6xl text-indigo-deep leading-[1.1] font-semibold tracking-tight">
+          {data.title}
+        </h1>
+
+        <!-- Subtitle -->
+        {data.subtitle && (
+          <p class="font-heading italic text-xl sm:text-2xl text-sage-botanical mt-3">
+            {data.subtitle}
+          </p>
+        )}
+
+        <!-- Byline & Date -->
+        <div class="mt-6 pt-4 border-t border-parchment-border flex flex-wrap items-center justify-between gap-4 font-mono text-xs text-sage-botanical uppercase tracking-wider">
+          <div>
+            WORDS BY <strong class="text-indigo-deep">{data.author}</strong> | {formattedDate}
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-ink-muted">TAGS:</span>
+            {data.tags.map((tag) => (
+              <span class="px-2 py-0.5 rounded bg-parchment-deep text-indigo-deep text-[11px]">
+                #{tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Two-Column Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        
+        <!-- Left / Center Column: Essay Content -->
+        <div class="lg:col-span-8 space-y-8">
+          
+          <!-- Hero Figure Image -->
+          {data.coverImage && (
+            <figure class="border border-parchment-border p-2 bg-parchment-light rounded-sm shadow-sm">
+              <img
+                src={data.coverImage}
+                alt={data.coverCaption || data.title}
+                class="w-full h-auto object-cover rounded-sm max-h-[500px]"
+              />
+              {data.coverCaption && (
+                <figcaption class="mt-3 font-mono text-xs text-sage-botanical text-center uppercase tracking-wider">
+                  {data.coverCaption}
+                </figcaption>
+              )}
+            </figure>
+          )}
+
+          <!-- Body Typography in Lora with Drop Cap -->
+          <div class="prose prose-lg max-w-none text-indigo-deep font-body leading-relaxed drop-cap bg-parchment-light/60 p-6 sm:p-8 rounded-sm border border-parchment-border/70">
+            <Content />
+          </div>
+
+          <!-- Bottom Field Sign-Off -->
+          <div class="p-6 bg-parchment-deep/40 border border-parchment-border rounded-sm flex items-start gap-4">
+            <div class="w-12 h-12 rounded-full bg-indigo-deep text-parchment-light font-heading text-2xl flex items-center justify-center shrink-0">
+              EA
+            </div>
+            <div class="font-mono text-xs text-indigo-deep">
+              <div class="font-bold text-sm text-indigo-dark uppercase">FIELD RESEARCH LOGGED BY DR. E. ARCHER</div>
+              <p class="font-body text-xs text-indigo-deep/80 mt-1">
+                PhD in Archaeological Chemistry & Textile Conservation. Field samples preserved in the Natural Dye Herbarium Collection.
+              </p>
+              <div class="mt-2 text-sage-botanical font-mono text-[11px]">
+                LOCATION: {data.specimen?.coordinates || 'Indus Valley & Mediterranean Field Stations'}
+              </div>
+            </div>
+          </div>
+
+          <!-- Back Navigation -->
+          <div class="pt-6 border-t border-parchment-border flex items-center justify-between font-mono text-xs uppercase tracking-wider">
+            <a href="/archives" class="text-indigo-deep hover:text-madder-red flex items-center gap-1 font-bold">
+              <span>&larr;</span>
+              <span>Back to Field Archives</span>
+            </a>
+            <a href="/materials" class="text-madder-red hover:text-madder-dark font-bold">
+              Explore Material Map &rarr;
+            </a>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Scientific Specimen Box & Swatches -->
+        <div class="lg:col-span-4 sticky top-28 space-y-6">
+          <FieldSpecimenCard
+            specimen={data.specimen}
+            swatches={data.swatches}
+          />
+        </div>
+
+      </div>
+
+    </div>
+  </article>
+</BaseLayout>

@@ -1,0 +1,127 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="About the Founder: Dr. E. Archer | Geographies of Natural Dyes"
+  description="Biography, studio philosophy, and research methodology of Dr. E. Archer, PhD archaeological chemist and natural dyer."
+>
+  <div class="py-12 bg-parchment-base">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Top classification banner -->
+      <div class="flex items-center justify-between border-b border-parchment-border pb-3 mb-10 font-mono text-xs text-sage-botanical uppercase tracking-wider">
+        <span>ABOUT THE FOUNDER // PhD RESEARCHER & ARTIST</span>
+        <span>FIELD STATION: SINDH & PROVENCE</span>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        
+        <!-- Left Column: Biography & Essay -->
+        <div class="lg:col-span-8 space-y-8">
+          
+          <div>
+            <h1 class="font-heading text-4xl sm:text-5xl md:text-6xl text-indigo-deep font-semibold">
+              Dr. E. Archer
+            </h1>
+            <p class="font-heading italic text-xl sm:text-2xl text-sage-botanical mt-2">
+              Archaeological Chemist, Natural Dyer & Cartographer of Color
+            </p>
+          </div>
+
+          <div class="border border-parchment-border p-2 bg-parchment-light rounded-sm shadow-sm">
+            <img
+              src="/images/studio-researcher.jpeg"
+              alt="Dr. E. Archer inspecting indigo dyed linen in her sunlit dye workshop"
+              class="w-full h-auto object-cover rounded-sm"
+            />
+            <div class="mt-2.5 font-mono text-xs text-sage-botanical uppercase tracking-wider text-center">
+              FIG. 1: DR. E. ARCHER IN HER NATURAL DYE STUDIO
+            </div>
+          </div>
+
+          <div class="prose prose-lg max-w-none text-indigo-deep font-body leading-relaxed bg-parchment-light/60 p-8 rounded-sm border border-parchment-border/70 space-y-6">
+            <p class="drop-cap">
+              I began my scholarly life in sterile university chemistry laboratories, surrounded by fume hoods, NMR spectrometers, and high-performance liquid chromatography columns. Yet my heart was always pulled toward the smell of crushed madder roots, the bubbling warmth of fermentation vats, and the tactile weave of handspun linen.
+            </p>
+
+            <p>
+              I completed my doctorate in archaeological chemistry, focusing on the micro-analytical identification of natural organic colorants preserved on Bronze Age and Hellenistic textile fragments. In the process, I realized that modern science often divorces chemistry from the poetry and tactile wisdom of the artisans who discovered these reactions four thousand years ago.
+            </p>
+
+            <h2 class="font-heading text-3xl text-indigo-deep mt-8 mb-4">
+              The Living Philosophy of the Studio
+            </h2>
+
+            <p>
+              This blog, <em>Geographies of Textiles and Natural Dyes</em>, exists to dismantle the artificial divide between scientific rigor and aesthetic wonder. Natural dyes are not merely historical relics or primitive substitutes for synthetic colorants; they are complex living systems governed by thermodynamics, coordination chemistry, and biodiversity.
+            </p>
+
+            <blockquote class="italic font-heading text-xl text-indigo-deep border-l-4 border-weld-ochre bg-parchment-deep/60 p-4 rounded-r">
+              "When an indigo vat breathes, it is not metaphor—it is billions of anaerobic bacteria reducing insoluble indigotin into liquid gold. The dyer’s hand is simply an instrument of that living ecology."
+            </blockquote>
+
+            <h2 class="font-heading text-3xl text-indigo-deep mt-8 mb-4">
+              Ethical Field Foraging & Conservation
+            </h2>
+
+            <p>
+              All botanical specimens collected in our field expeditions adhere strictly to non-destructive harvesting practices. We never collect rare or endangered species. Bark is gathered only from naturally fallen branches after seasonal storms; roots (such as madder) are cultivated in our experimental farm plots; and leaves are harvested in rotational cycles that preserve plant vitality.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Curriculum & Field Ledger -->
+        <div class="lg:col-span-4 space-y-6 sticky top-28">
+          
+          <div class="border border-parchment-border bg-parchment-light p-6 rounded-sm space-y-4 shadow-sm">
+            <div class="font-mono text-xs uppercase tracking-widest text-sage-botanical font-bold border-b border-parchment-border pb-2.5">
+              CURRICULUM & APPOINTMENTS
+            </div>
+
+            <ul class="space-y-3 font-mono text-xs text-indigo-deep">
+              <li class="border-b border-parchment-border/40 pb-2">
+                <span class="text-sage-botanical block text-[11px]">DOCTORATE:</span>
+                <strong>PhD, Archaeological Chemistry</strong><br />
+                <em>Chromatographic Analysis of Ancient Dyes</em>
+              </li>
+              <li class="border-b border-parchment-border/40 pb-2">
+                <span class="text-sage-botanical block text-[11px]">RESEARCH FELLOWSHIP:</span>
+                <strong>Mediterranean Textile Conservation</strong><br />
+                <em>Hellenistic & Byzantine Woolens</em>
+              </li>
+              <li class="border-b border-parchment-border/40 pb-2">
+                <span class="text-sage-botanical block text-[11px]">LABORATORY:</span>
+                <strong>Natural Dye Herbarium & Fiber Lab</strong><br />
+                <em>Analytical Color Cartography</em>
+              </li>
+              <li>
+                <span class="text-sage-botanical block text-[11px]">FIELD STATIONS:</span>
+                <span class="text-madder-red font-semibold">Indus Delta &bull; Anatolia &bull; Provence</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Laboratory Tools -->
+          <div class="border border-parchment-border bg-parchment-deep/40 p-6 rounded-sm space-y-3">
+            <div class="font-mono text-xs uppercase tracking-widest text-sage-botanical font-bold border-b border-parchment-border pb-2">
+              STUDIO & FIELD APPARATUS
+            </div>
+            <ul class="font-mono text-xs text-indigo-deep/90 space-y-1.5 list-disc pl-4">
+              <li>UV-Vis Spectrophotometer for &lambda;<sub>max</sub> recording</li>
+              <li>Calibrated pH meters & redox oxidation electrodes</li>
+              <li>Earthenware fermentation cisterns (200L capacity)</li>
+              <li>Hand-carved mulberry wood stirring paddles</li>
+              <li>Potash alum, ferrous sulfate & cream of tartar stores</li>
+              <li>Hand-woven linen and organic wool swatches</li>
+            </ul>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</BaseLayout>

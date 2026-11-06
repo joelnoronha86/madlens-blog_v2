@@ -1,0 +1,119 @@
+---
+interface Props {
+  post: {
+    id: string;
+    data: {
+      title: string;
+      subtitle?: string;
+      excerpt: string;
+      pubDate: Date;
+      issue?: string;
+      draft?: boolean;
+      tags: string[];
+      specimen?: {
+        name: string;
+        commonName?: string;
+        logNo?: string;
+        origin?: string;
+        coordinates?: string;
+      };
+      swatches?: Array<{
+        name: string;
+        color: string;
+      }>;
+      coverImage?: string;
+      coverCaption?: string;
+    };
+  };
+}
+
+const { post } = Astro.props;
+const { data, id } = post;
+const slug = id.replace(/\.md$/, '');
+
+// Format date nicely
+const formattedDate = new Intl.DateTimeFormat('en-US', {
+  month: 'long',
+  year: 'numeric',
+}).format(data.pubDate);
+
+// Primary swatch color for the card's accent tag
+const primarySwatch = data.swatches && data.swatches.length > 0 ? data.swatches[0] : null;
+---
+
+<article class="group relative flex flex-col bg-parchment-light border border-parchment-border hover:border-indigo-deep/40 transition-all duration-300 shadow-sm hover:shadow-md rounded-sm overflow-hidden">
+  
+  <!-- Image container -->
+  {data.coverImage && (
+    <a href={`/posts/${slug}`} class="relative block overflow-hidden aspect-[16/10] bg-parchment-deep">
+      <img
+        src={data.coverImage}
+        alt={data.coverCaption || data.title}
+        class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+        loading="lazy"
+      />
+      
+      <!-- Primary swatch indicator badge on image corner -->
+      {primarySwatch && (
+        <div class="absolute bottom-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded bg-parchment-base/95 backdrop-blur-sm border border-parchment-border shadow-sm">
+          <span
+            class="w-3.5 h-3.5 rounded-full inline-block border border-black/10 shadow-inner"
+            style={`background-color: ${primarySwatch.color};`}
+          ></span>
+          <span class="font-mono text-[10px] uppercase tracking-wider text-indigo-deep font-semibold">
+            {primarySwatch.name}
+          </span>
+        </div>
+      )}
+
+      <!-- Draft badge if draft -->
+      {data.draft && (
+        <div class="absolute top-3 left-3 px-2 py-0.5 rounded bg-madder-red text-parchment-light font-mono text-[10px] uppercase tracking-widest font-bold shadow">
+          DRAFT
+        </div>
+      )}
+    </a>
+  )}
+
+  <!-- Card content -->
+  <div class="p-6 flex flex-col flex-grow justify-between">
+    <div>
+      <!-- Specimen Log Tag -->
+      <div class="flex items-center justify-between text-xs font-mono text-sage-botanical mb-2.5">
+        <span class="uppercase tracking-widest font-bold">
+          {data.specimen?.name ? `LOG: ${data.specimen.name}` : (data.tags[0] || 'RESEARCH')}
+        </span>
+        <span class="text-[11px] text-ink-muted">
+          {formattedDate}
+        </span>
+      </div>
+
+      <!-- Title in Cormorant Garamond -->
+      <h3 class="font-heading text-2xl sm:text-3xl text-indigo-deep leading-snug group-hover:text-madder-red transition-colors duration-200">
+        <a href={`/posts/${slug}`}>
+          {data.title}
+        </a>
+      </h3>
+
+      <!-- Subtitle or Excerpt in Lora -->
+      <p class="font-body text-sm sm:text-base text-indigo-deep/80 mt-3 line-clamp-3 leading-relaxed">
+        {data.excerpt}
+      </p>
+    </div>
+
+    <!-- Metadata footer with coordinates and read button -->
+    <div class="mt-6 pt-4 border-t border-parchment-border/60 flex items-center justify-between font-mono text-xs text-sage-botanical">
+      <span>
+        {data.specimen?.coordinates || 'FIELD ARCHIVE'}
+      </span>
+      <a
+        href={`/posts/${slug}`}
+        class="inline-flex items-center gap-1 text-madder-red hover:text-madder-dark font-bold uppercase tracking-wider group-hover:translate-x-1 transition-transform"
+      >
+        <span>READ ESSAY</span>
+        <span>&rarr;</span>
+      </a>
+    </div>
+  </div>
+
+</article>

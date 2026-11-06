@@ -1,0 +1,164 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('posts', ({ data }) => {
+  return data.draft !== true;
+});
+
+const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+// Collect all unique tags
+const allTags = Array.from(new Set(sortedPosts.flatMap((post) => post.data.tags)));
+---
+
+<BaseLayout
+  title="Field Archives & Research Dispatches | Geographies of Natural Dyes"
+  description="Chronological logbook of field essays, chemical analyses, and textile dyeing research."
+>
+  <div class="py-12 bg-parchment-base border-b border-parchment-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Page Header -->
+      <div class="max-w-3xl mb-10">
+        <div class="font-mono text-xs uppercase tracking-widest text-sage-botanical font-bold mb-2">
+          COMPLETE FIELD LOGS & REPOSITORY
+        </div>
+        <h1 class="font-heading text-4xl sm:text-5xl md:text-6xl text-indigo-deep">
+          Field Archives
+        </h1>
+        <p class="font-body text-base sm:text-lg text-indigo-deep/80 mt-3 leading-relaxed">
+          Explore all published monographs, laboratory fermentation notes, and botanical cartographies documenting natural dye traditions across the globe.
+        </p>
+      </div>
+
+      <!-- Filter & Search Controls -->
+      <div class="bg-parchment-light border border-parchment-border p-4 sm:p-6 rounded-sm shadow-sm mb-12">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+          
+          <!-- Search input -->
+          <div class="w-full md:w-96 relative">
+            <input
+              id="search-input"
+              type="text"
+              placeholder="Search by pigment, plant, formula, or place..."
+              class="w-full pl-10 pr-4 py-2.5 rounded border border-parchment-border bg-parchment-base font-mono text-xs text-indigo-deep placeholder-ink-muted/70 focus:outline-none focus:border-indigo-deep"
+            />
+            <svg class="w-4 h-4 text-sage-botanical absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+
+          <!-- Tags list -->
+          <div class="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              class="tag-filter-btn px-3 py-1 rounded font-mono text-xs uppercase tracking-wider bg-indigo-deep text-parchment-light border border-indigo-deep"
+              data-tag="all"
+            >
+              All ({sortedPosts.length})
+            </button>
+            {allTags.map((tag) => (
+              <button
+                type="button"
+                class="tag-filter-btn px-3 py-1 rounded font-mono text-xs uppercase tracking-wider bg-parchment-base text-indigo-deep border border-parchment-border hover:border-indigo-deep"
+                data-tag={tag.toLowerCase()}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Posts Grid -->
+      <div id="posts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {sortedPosts.map((post) => (
+          <div
+            class="post-wrapper"
+            data-title={post.data.title.toLowerCase()}
+            data-excerpt={post.data.excerpt.toLowerCase()}
+            data-specimen={post.data.specimen?.name.toLowerCase() || ''}
+            data-tags={post.data.tags.map((t) => t.toLowerCase()).join(' ')}
+          >
+            <PostCard post={post} />
+          </div>
+        ))}
+      </div>
+
+      <!-- Empty state when no search matches -->
+      <div id="no-results" class="hidden text-center py-16 bg-parchment-light border border-parchment-border rounded-sm">
+        <p class="font-heading text-2xl text-indigo-deep">No field logs found</p>
+        <p class="font-body text-sm text-sage-botanical mt-2">Try adjusting your keywords or clearing the filter.</p>
+      </div>
+
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const searchInput = document.getElementById('search-input') as HTMLInputElement | null;
+  const tagBtns = document.querySelectorAll('.tag-filter-btn');
+  const postWrappers = document.querySelectorAll('.post-wrapper');
+  const noResults = document.getElementById('no-results');
+
+  let activeTag = 'all';
+  let searchTerm = '';
+
+  function filterPosts() {
+    let visibleCount = 0;
+
+    postWrappers.forEach((wrapper) => {
+      const el = wrapper as HTMLElement;
+      const title = el.getAttribute('data-title') || '';
+      const excerpt = el.getAttribute('data-excerpt') || '';
+      const specimen = el.getAttribute('data-specimen') || '';
+      const tags = el.getAttribute('data-tags') || '';
+
+      const matchesSearch =
+        !searchTerm ||
+        title.includes(searchTerm) ||
+        excerpt.includes(searchTerm) ||
+        specimen.includes(searchTerm) ||
+        tags.includes(searchTerm);
+
+      const matchesTag = activeTag === 'all' || tags.includes(activeTag);
+
+      if (matchesSearch && matchesTag) {
+        el.style.display = 'block';
+        visibleCount++;
+      } else {
+        el.style.display = 'none';
+      }
+    });
+
+    if (noResults) {
+      if (visibleCount === 0) {
+        noResults.classList.remove('hidden');
+      } else {
+        noResults.classList.add('hidden');
+      }
+    }
+  }
+
+  searchInput?.addEventListener('input', (e) => {
+    searchTerm = (e.target as HTMLInputElement).value.toLowerCase().trim();
+    filterPosts();
+  });
+
+  tagBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      tagBtns.forEach((b) => {
+        b.classList.remove('bg-indigo-deep', 'text-parchment-light');
+        b.classList.add('bg-parchment-base', 'text-indigo-deep');
+      });
+      btn.classList.add('bg-indigo-deep', 'text-parchment-light');
+      btn.classList.remove('bg-parchment-base', 'text-indigo-deep');
+
+      activeTag = btn.getAttribute('data-tag') || 'all';
+      filterPosts();
+    });
+  });
+</script>

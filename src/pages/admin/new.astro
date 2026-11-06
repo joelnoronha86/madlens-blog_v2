@@ -1,0 +1,676 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="New Field Log | Tiptap Writer Studio"
+  description="Compose and publish botanical monographs and textile chemistry research."
+>
+  <div class="py-8 bg-parchment-base min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Studio Header -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-parchment-border pb-5 mb-6">
+        <div>
+          <div class="flex items-center gap-2 font-mono text-xs text-sage-botanical uppercase tracking-wider mb-1">
+            <a href="/admin" class="hover:text-madder-red transition-colors">&larr; Back to Dashboard</a>
+            <span>&bull;</span>
+            <span id="draft-status-pill" class="px-2 py-0.5 rounded text-[10px] bg-amber-100 text-amber-800 border border-amber-300 font-bold">
+              UNSAVED
+            </span>
+          </div>
+          <h1 class="font-heading text-3xl sm:text-4xl text-indigo-deep">
+            Author New Monograph
+          </h1>
+        </div>
+
+        <!-- Action Controls -->
+        <div class="flex flex-wrap items-center gap-2.5">
+          <!-- Live Preview Toggle -->
+          <button
+            id="toggle-preview-btn"
+            type="button"
+            class="px-3.5 py-2 rounded border border-indigo-deep/30 bg-parchment-light hover:bg-parchment-deep text-indigo-deep font-mono text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-sm"
+          >
+            <svg class="w-4 h-4 text-sage-botanical" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <span id="preview-toggle-text">Show Split Preview</span>
+          </button>
+
+          <!-- Save Draft Button -->
+          <button
+            id="save-draft-btn"
+            type="button"
+            class="px-4 py-2 rounded border border-madder-red/40 bg-madder-soft hover:bg-madder-red hover:text-parchment-light text-madder-red font-mono text-xs uppercase tracking-wider font-bold transition-all shadow-sm flex items-center gap-1.5"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+            </svg>
+            <span>Save Draft</span>
+          </button>
+
+          <!-- Publish to Production Button -->
+          <button
+            id="publish-btn"
+            type="button"
+            class="px-5 py-2 rounded bg-indigo-deep hover:bg-emerald-800 text-parchment-light font-mono text-xs uppercase tracking-widest font-bold transition-all shadow-sm flex items-center gap-1.5"
+          >
+            <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>Publish to Production</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Toast Feedback Message -->
+      <div id="toast-msg" class="hidden mb-6 p-4 rounded-sm border font-mono text-xs transition-all shadow-sm"></div>
+
+      <!-- Main Editor Container (Grid: Editor + Optional Split Preview) -->
+      <div id="editor-grid" class="grid grid-cols-1 gap-8 items-start">
+        
+        <!-- Editor Column -->
+        <div id="editor-col" class="space-y-6">
+          
+          <!-- Article Metadata Form (Collapsible / Clean) -->
+          <div class="bg-parchment-light border border-parchment-border p-6 rounded-sm shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b border-parchment-border pb-2.5">
+              <span class="font-mono text-xs uppercase tracking-widest text-sage-botanical font-bold">
+                ARTICLE TAXONOMY & METADATA
+              </span>
+              <span class="font-mono text-[11px] text-ink-muted">YAML FRONTMATTER</span>
+            </div>
+
+            <!-- Title & Slug -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-mono text-xs uppercase text-sage-botanical mb-1 font-bold">
+                  Title <span class="text-madder-red">*</span>
+                </label>
+                <input
+                  id="post-title"
+                  type="text"
+                  placeholder="e.g. The Chemistry & Art of Indigo Dyeing"
+                  class="w-full px-3.5 py-2 rounded border border-parchment-border bg-parchment-base font-heading text-lg sm:text-xl text-indigo-deep focus:outline-none focus:border-indigo-deep font-semibold"
+                  required
+                />
+              </div>
+
+              <div>
+                <label class="block font-mono text-xs uppercase text-sage-botanical mb-1 font-bold">
+                  File Slug (.md) <span class="text-madder-red">*</span>
+                </label>
+                <div class="flex items-center">
+                  <span class="font-mono text-xs text-sage-botanical bg-parchment-deep px-2 py-2.5 border border-r-0 border-parchment-border rounded-l">
+                    posts/
+                  </span>
+                  <input
+                    id="post-slug"
+                    type="text"
+                    placeholder="my-new-research-post"
+                    class="w-full px-3 py-2 rounded-r border border-parchment-border bg-parchment-base font-mono text-xs text-indigo-deep focus:outline-none focus:border-indigo-deep"
+                    required
+                  />
+                  <span class="font-mono text-xs text-sage-botanical bg-parchment-deep px-2 py-2.5 border border-l-0 border-parchment-border rounded-r">
+                    .md
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Subtitle & Issue -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-mono text-xs uppercase text-sage-botanical mb-1">Subtitle</label>
+                <input
+                  id="post-subtitle"
+                  type="text"
+                  placeholder="e.g. The historic journeys and oxidation of natural blue"
+                  class="w-full px-3 py-2 rounded border border-parchment-border bg-parchment-base font-heading italic text-base text-indigo-deep focus:outline-none focus:border-indigo-deep"
+                />
+              </div>
+              <div>
+                <label class="block font-mono text-xs uppercase text-sage-botanical mb-1">Issue Badge</label>
+                <input
+                  id="post-issue"
+                  type="text"
+                  value="ARTICLE ISSUE 05 // THE CHEMISTRY OF COLOR"
+                  class="w-full px-3 py-2 rounded border border-parchment-border bg-parchment-base font-mono text-xs text-indigo-deep focus:outline-none focus:border-indigo-deep"
+                />
+              </div>
+            </div>
+
+            <!-- Excerpt -->
+            <div>
+              <label class="block font-mono text-xs uppercase text-sage-botanical mb-1 font-bold">Excerpt / Abstract</label>
+              <textarea
+                id="post-excerpt"
+                rows="2"
+                placeholder="A brief 1-2 sentence overview of the research monograph..."
+                class="w-full px-3 py-2 rounded border border-parchment-border bg-parchment-base font-body text-sm text-indigo-deep focus:outline-none focus:border-indigo-deep leading-relaxed"
+              ></textarea>
+            </div>
+
+            <!-- Specimen & Cartography Accordion -->
+            <details class="pt-2 border-t border-parchment-border/60">
+              <summary class="font-mono text-xs uppercase text-indigo-deep cursor-pointer font-bold hover:text-madder-red transition-colors py-1">
+                + Expand Specimen, Coordinates & Chemical Data
+              </summary>
+              <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+                <div>
+                  <label class="block font-mono text-[11px] uppercase text-sage-botanical mb-1">Specimen Botanical Name</label>
+                  <input
+                    id="specimen-name"
+                    type="text"
+                    placeholder="e.g. Indigofera tinctoria"
+                    class="w-full px-3 py-1.5 rounded border border-parchment-border bg-parchment-base font-mono text-xs text-indigo-deep"
+                  />
+                </div>
+                <div>
+                  <label class="block font-mono text-[11px] uppercase text-sage-botanical mb-1">Coordinates</label>
+                  <input
+                    id="specimen-coordinates"
+                    type="text"
+                    placeholder="e.g. 25°12' N, 68°51' E"
+                    class="w-full px-3 py-1.5 rounded border border-parchment-border bg-parchment-base font-mono text-xs text-indigo-deep"
+                  />
+                </div>
+                <div>
+                  <label class="block font-mono text-[11px] uppercase text-sage-botanical mb-1">Origin Archive</label>
+                  <input
+                    id="specimen-origin"
+                    type="text"
+                    placeholder="e.g. Indus Valley Archive"
+                    class="w-full px-3 py-1.5 rounded border border-parchment-border bg-parchment-base font-mono text-xs text-indigo-deep"
+                  />
+                </div>
+                <div>
+                  <label class="block font-mono text-[11px] uppercase text-sage-botanical mb-1">Chemical Chromophore</label>
+                  <input
+                    id="specimen-chemical"
+                    type="text"
+                    placeholder="e.g. Indigotin (C16H10N2O2)"
+                    class="w-full px-3 py-1.5 rounded border border-parchment-border bg-parchment-base font-mono text-xs text-indigo-deep"
+                  />
+                </div>
+              </div>
+
+              <!-- Tags and Swatches -->
+              <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block font-mono text-[11px] uppercase text-sage-botanical mb-1">Tags (comma-separated)</label>
+                  <input
+                    id="post-tags"
+                    type="text"
+                    placeholder="Indigo, Fermentation, Indus Valley, Cellulose"
+                    class="w-full px-3 py-1.5 rounded border border-parchment-border bg-parchment-base font-mono text-xs text-indigo-deep"
+                  />
+                </div>
+                <div>
+                  <label class="block font-mono text-[11px] uppercase text-sage-botanical mb-1">Cover Image URL</label>
+                  <div class="flex gap-2">
+                    <input
+                      id="post-cover"
+                      type="text"
+                      placeholder="/images/indigo-vat-fermentation.jpeg"
+                      class="w-full px-3 py-1.5 rounded border border-parchment-border bg-parchment-base font-mono text-xs text-indigo-deep"
+                    />
+                    <select
+                      id="select-cover-preset"
+                      class="px-2 py-1.5 border border-parchment-border bg-parchment-deep rounded font-mono text-[11px] text-indigo-deep"
+                    >
+                      <option value="">Presets...</option>
+                      <option value="/images/indigo-vat-fermentation.jpeg">Indigo Vat</option>
+                      <option value="/images/research-specimens-triptych.jpeg">Specimens Triptych</option>
+                      <option value="/images/studio-researcher.jpeg">Studio Researcher</option>
+                      <option value="/images/hero-field-notebook-flatlay.jpeg">Field Notebook</option>
+                      <option value="/images/indigo-leaf-field-ledger.jpeg">Indigo Leaf</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+
+          <!-- Tiptap Editor & Toolbar -->
+          <div class="bg-parchment-light border border-parchment-border rounded-sm shadow-sm overflow-hidden">
+            
+            <!-- Tiptap UI Toolbar -->
+            <div id="tiptap-toolbar" class="border-b border-parchment-border bg-parchment-deep/70 p-2 sm:p-3 flex flex-wrap items-center gap-1.5 font-mono text-xs">
+              
+              <!-- Formatting buttons -->
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent font-bold" data-action="bold" title="Bold (Cmd+B)">
+                <strong>B</strong>
+              </button>
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent italic" data-action="italic" title="Italic (Cmd+I)">
+                <em>I</em>
+              </button>
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent line-through" data-action="strike" title="Strikethrough">
+                S
+              </button>
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent font-mono" data-action="code" title="Inline Code">
+                &lt;/&gt;
+              </button>
+
+              <span class="w-px h-5 bg-parchment-border mx-1"></span>
+
+              <!-- Headings -->
+              <button type="button" class="tb-btn px-2 py-1 rounded hover:bg-parchment-base border border-transparent font-heading font-bold" data-action="h1" title="Heading 1">
+                H1
+              </button>
+              <button type="button" class="tb-btn px-2 py-1 rounded hover:bg-parchment-base border border-transparent font-heading font-bold" data-action="h2" title="Heading 2">
+                H2
+              </button>
+              <button type="button" class="tb-btn px-2 py-1 rounded hover:bg-parchment-base border border-transparent font-heading font-bold" data-action="h3" title="Heading 3">
+                H3
+              </button>
+              <button type="button" class="tb-btn px-2 py-1 rounded hover:bg-parchment-base border border-transparent" data-action="paragraph" title="Paragraph">
+                P
+              </button>
+
+              <span class="w-px h-5 bg-parchment-border mx-1"></span>
+
+              <!-- Lists & Quotes -->
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent" data-action="bulletList" title="Bullet List">
+                &bull; List
+              </button>
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent" data-action="orderedList" title="Ordered List">
+                1. List
+              </button>
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent font-heading italic" data-action="blockquote" title="Blockquote">
+                &ldquo; Quote
+              </button>
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent" data-action="codeBlock" title="Code Block">
+                [Pre]
+              </button>
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent" data-action="hr" title="Horizontal Rule">
+                &mdash; HR
+              </button>
+
+              <span class="w-px h-5 bg-parchment-border mx-1"></span>
+
+              <!-- Insert Image & Link -->
+              <button type="button" class="tb-btn px-2 py-1 rounded hover:bg-parchment-base border border-transparent text-indigo-deep flex items-center gap-1" data-action="image" title="Insert Image">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span>Image</span>
+              </button>
+              <button type="button" class="tb-btn px-2 py-1 rounded hover:bg-parchment-base border border-transparent text-indigo-deep flex items-center gap-1" data-action="link" title="Insert Link">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+                <span>Link</span>
+              </button>
+
+              <span class="w-px h-5 bg-parchment-border mx-1"></span>
+
+              <!-- History -->
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent" data-action="undo" title="Undo (Cmd+Z)">
+                &larr;
+              </button>
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent" data-action="redo" title="Redo (Cmd+Y)">
+                &rarr;
+              </button>
+            </div>
+
+            <!-- Editor Element -->
+            <div id="tiptap-editor-container" class="p-6 sm:p-8 min-h-[420px] bg-parchment-light focus-within:ring-1 focus-within:ring-indigo-deep/20">
+              <div id="tiptap-editor-element"></div>
+            </div>
+
+            <!-- Footer word count -->
+            <div class="px-6 py-2.5 bg-parchment-deep/40 border-t border-parchment-border flex items-center justify-between font-mono text-[11px] text-sage-botanical">
+              <span id="word-count">0 words</span>
+              <span>Tiptap WYSIWYG Engine &bull; Auto-synced to Markdown</span>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Optional Live Split Preview Column -->
+        <div id="preview-col" class="hidden space-y-6">
+          <div class="bg-parchment-light border border-parchment-border p-6 rounded-sm shadow-sm sticky top-28 max-h-[85vh] overflow-y-auto">
+            <div class="border-b border-parchment-border pb-3 mb-6 flex items-center justify-between">
+              <span class="font-mono text-xs uppercase tracking-widest text-madder-red font-bold">
+                ✦ LIVE FIELD ESSAY PREVIEW ✦
+              </span>
+              <span class="font-mono text-[10px] text-sage-botanical">ASTRO LAYOUT MIRROR</span>
+            </div>
+
+            <!-- Preview Header -->
+            <div class="space-y-3 mb-6">
+              <span id="prev-issue" class="font-mono text-xs text-madder-red font-bold block uppercase"></span>
+              <h2 id="prev-title" class="font-heading text-3xl text-indigo-deep font-semibold"></h2>
+              <p id="prev-subtitle" class="font-heading italic text-lg text-sage-botanical"></p>
+              <div class="font-mono text-xs text-sage-botanical border-t border-parchment-border/60 pt-2">
+                WORDS BY DR. E. ARCHER | <span id="prev-date"></span>
+              </div>
+            </div>
+
+            <!-- Preview Specimen Card -->
+            <div class="border border-parchment-border bg-parchment-base p-4 rounded-sm mb-6 font-mono text-xs text-indigo-deep space-y-2">
+              <div class="text-[10px] uppercase tracking-widest text-sage-botanical font-bold border-b border-parchment-border pb-1">
+                FIELD SPECIMEN DATA
+              </div>
+              <div><strong class="text-sage-botanical">SPECIMEN:</strong> <span id="prev-specimen" class="italic font-bold"></span></div>
+              <div><strong class="text-sage-botanical">COORDINATES:</strong> <span id="prev-coords" class="text-madder-red"></span></div>
+              <div><strong class="text-sage-botanical">CHROMOPHORE:</strong> <span id="prev-chemical"></span></div>
+            </div>
+
+            <!-- Preview Body Content -->
+            <div id="prev-body" class="prose prose-sm text-indigo-deep font-body leading-relaxed drop-cap border-t border-parchment-border pt-4">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import { Editor } from '@tiptap/core';
+  import StarterKit from '@tiptap/starter-kit';
+  import Image from '@tiptap/extension-image';
+  import Link from '@tiptap/extension-link';
+  import Placeholder from '@tiptap/extension-placeholder';
+  import TurndownService from 'turndown';
+  import { getGitHubConfig, commitPostToGitHub, serializeMarkdownWithFrontmatter } from '../../utils/github';
+
+  const turndown = new TurndownService({
+    headingStyle: 'atx',
+    codeBlockStyle: 'fenced',
+    emDelimiter: '*',
+  });
+
+  // Slug auto-generation helper
+  function slugify(text: string): string {
+    return text
+      .toString()
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]+/g, '')
+      .replace(/\-\-+/g, '-');
+  }
+
+  // Initialize Tiptap Editor
+  const editor = new Editor({
+    element: document.querySelector('#tiptap-editor-element') as HTMLElement,
+    extensions: [
+      StarterKit,
+      Image,
+      Link.configure({ openOnClick: false }),
+      Placeholder.configure({
+        placeholder: 'Write your scientific and poetic observations here...',
+      }),
+    ],
+    content: `
+      <h2>The Chemistry & Living Art of the Vat</h2>
+      <p>For millennia, the cartography of human culture has been traced in the vibrant, fugitive hues of the natural world. In our laboratory and studio expeditions, we explore the precise oxidation chemistry that brings plant cellulose and protein fibers alive.</p>
+      <blockquote>"A natural dye carries the mineral memory of its soil and water."</blockquote>
+      <p>Enter your observations, chemical balances, and historical reflections above.</p>
+    `,
+    onUpdate: () => {
+      updateWordCount();
+      updateLivePreview();
+    },
+  });
+
+  // Wire toolbar buttons
+  const toolbar = document.getElementById('tiptap-toolbar');
+  toolbar?.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('.tb-btn') as HTMLElement | null;
+    if (!btn || !editor) return;
+
+    const action = btn.getAttribute('data-action');
+    editor.chain().focus();
+
+    switch (action) {
+      case 'bold': editor.chain().focus().toggleBold().run(); break;
+      case 'italic': editor.chain().focus().toggleItalic().run(); break;
+      case 'strike': editor.chain().focus().toggleStrike().run(); break;
+      case 'code': editor.chain().focus().toggleCode().run(); break;
+      case 'h1': editor.chain().focus().toggleHeading({ level: 1 }).run(); break;
+      case 'h2': editor.chain().focus().toggleHeading({ level: 2 }).run(); break;
+      case 'h3': editor.chain().focus().toggleHeading({ level: 3 }).run(); break;
+      case 'paragraph': editor.chain().focus().setParagraph().run(); break;
+      case 'bulletList': editor.chain().focus().toggleBulletList().run(); break;
+      case 'orderedList': editor.chain().focus().toggleOrderedList().run(); break;
+      case 'blockquote': editor.chain().focus().toggleBlockquote().run(); break;
+      case 'codeBlock': editor.chain().focus().toggleCodeBlock().run(); break;
+      case 'hr': editor.chain().focus().setHorizontalRule().run(); break;
+      case 'undo': editor.chain().focus().undo().run(); break;
+      case 'redo': editor.chain().focus().redo().run(); break;
+      case 'image': {
+        const url = prompt('Enter image URL or path (e.g. /images/indigo-vat-fermentation.jpeg):');
+        if (url) editor.chain().focus().setImage({ src: url }).run();
+        break;
+      }
+      case 'link': {
+        const url = prompt('Enter link URL:');
+        if (url) editor.chain().focus().setLink({ href: url }).run();
+        break;
+      }
+    }
+  });
+
+  // Word count helper
+  function updateWordCount() {
+    const text = editor.getText();
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+    const wordCountEl = document.getElementById('word-count');
+    if (wordCountEl) wordCountEl.textContent = `${words} words`;
+  }
+
+  // Preset cover image picker
+  const coverSelect = document.getElementById('select-cover-preset') as HTMLSelectElement | null;
+  const coverInput = document.getElementById('post-cover') as HTMLInputElement | null;
+  coverSelect?.addEventListener('change', () => {
+    if (coverSelect.value && coverInput) {
+      coverInput.value = coverSelect.value;
+      updateLivePreview();
+    }
+  });
+
+  // Auto-fill slug from title
+  const titleInput = document.getElementById('post-title') as HTMLInputElement | null;
+  const slugInput = document.getElementById('post-slug') as HTMLInputElement | null;
+  let userEditedSlug = false;
+
+  slugInput?.addEventListener('input', () => {
+    userEditedSlug = true;
+  });
+
+  titleInput?.addEventListener('input', () => {
+    if (!userEditedSlug && slugInput) {
+      slugInput.value = slugify(titleInput.value);
+    }
+    updateLivePreview();
+  });
+
+  // Live Split Preview Logic
+  const togglePreviewBtn = document.getElementById('toggle-preview-btn');
+  const previewCol = document.getElementById('preview-col');
+  const editorGrid = document.getElementById('editor-grid');
+  const previewText = document.getElementById('preview-toggle-text');
+  let isPreviewOpen = false;
+
+  function updateLivePreview() {
+    if (!isPreviewOpen) return;
+    const title = (document.getElementById('post-title') as HTMLInputElement)?.value || 'Untitled Monograph';
+    const subtitle = (document.getElementById('post-subtitle') as HTMLInputElement)?.value || '';
+    const issue = (document.getElementById('post-issue') as HTMLInputElement)?.value || 'FIELD LOG // NATURAL DYES';
+    const specimen = (document.getElementById('specimen-name') as HTMLInputElement)?.value || 'Botanical Specimen';
+    const coords = (document.getElementById('specimen-coordinates') as HTMLInputElement)?.value || 'Coordinates Unrecorded';
+    const chem = (document.getElementById('specimen-chemical') as HTMLInputElement)?.value || 'Chromophore Analysis';
+
+    const pTitle = document.getElementById('prev-title');
+    const pSub = document.getElementById('prev-subtitle');
+    const pIssue = document.getElementById('prev-issue');
+    const pSpecimen = document.getElementById('prev-specimen');
+    const pCoords = document.getElementById('prev-coords');
+    const pChem = document.getElementById('prev-chemical');
+    const pDate = document.getElementById('prev-date');
+    const pBody = document.getElementById('prev-body');
+
+    if (pTitle) pTitle.textContent = title;
+    if (pSub) pSub.textContent = subtitle;
+    if (pIssue) pIssue.textContent = issue;
+    if (pSpecimen) pSpecimen.textContent = specimen;
+    if (pCoords) pCoords.textContent = coords;
+    if (pChem) pChem.textContent = chem;
+    if (pDate) pDate.textContent = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    if (pBody && editor) {
+      pBody.innerHTML = editor.getHTML();
+    }
+  }
+
+  togglePreviewBtn?.addEventListener('click', () => {
+    isPreviewOpen = !isPreviewOpen;
+    if (isPreviewOpen) {
+      previewCol?.classList.remove('hidden');
+      editorGrid?.classList.remove('grid-cols-1');
+      editorGrid?.classList.add('grid-cols-1', 'lg:grid-cols-2');
+      if (previewText) previewText.textContent = 'Hide Split Preview';
+      updateLivePreview();
+    } else {
+      previewCol?.classList.add('hidden');
+      editorGrid?.classList.add('grid-cols-1');
+      editorGrid?.classList.remove('lg:grid-cols-2');
+      if (previewText) previewText.textContent = 'Show Split Preview';
+    }
+  });
+
+  // Frontmatter Collector
+  function collectFrontmatter(isDraft: boolean) {
+    const title = (document.getElementById('post-title') as HTMLInputElement)?.value.trim() || 'Untitled Monograph';
+    const subtitle = (document.getElementById('post-subtitle') as HTMLInputElement)?.value.trim() || undefined;
+    const excerpt = (document.getElementById('post-excerpt') as HTMLTextAreaElement)?.value.trim() || title;
+    const issue = (document.getElementById('post-issue') as HTMLInputElement)?.value.trim() || 'FIELD LOG // NATURAL DYES';
+    const specimenName = (document.getElementById('specimen-name') as HTMLInputElement)?.value.trim();
+    const coordinates = (document.getElementById('specimen-coordinates') as HTMLInputElement)?.value.trim();
+    const origin = (document.getElementById('specimen-origin') as HTMLInputElement)?.value.trim();
+    const chemical = (document.getElementById('specimen-chemical') as HTMLInputElement)?.value.trim();
+    const tagsRaw = (document.getElementById('post-tags') as HTMLInputElement)?.value.trim();
+    const coverImage = (document.getElementById('post-cover') as HTMLInputElement)?.value.trim() || undefined;
+
+    const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : ['Natural Dye'];
+
+    return {
+      title,
+      subtitle,
+      excerpt,
+      author: 'Dr. E. Archer',
+      pubDate: new Date().toISOString().split('T')[0],
+      issue,
+      draft: isDraft,
+      tags,
+      specimen: specimenName ? {
+        name: specimenName,
+        origin: origin || undefined,
+        coordinates: coordinates || undefined,
+        chemicalStructure: chemical ? {
+          name: chemical.split('(')[0].trim(),
+          formula: chemical.includes('(') ? chemical.split('(')[1].replace(')', '').trim() : 'Active Chromophore',
+        } : undefined,
+      } : undefined,
+      coverImage,
+    };
+  }
+
+  // Toast notifier
+  function showToast(msg: string, type: 'success' | 'error' | 'info') {
+    const toast = document.getElementById('toast-msg');
+    if (!toast) return;
+
+    toast.textContent = msg;
+    toast.className = `p-4 rounded-sm border font-mono text-xs shadow-sm block ${
+      type === 'success' ? 'bg-emerald-50 text-emerald-800 border-emerald-300' :
+      type === 'error' ? 'bg-red-50 text-red-800 border-red-300' :
+      'bg-indigo-soft text-indigo-deep border-indigo-deep/30'
+    }`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Save Draft / Publish Handlers
+  async function handleSave(isDraft: boolean) {
+    const title = (document.getElementById('post-title') as HTMLInputElement)?.value.trim();
+    let slug = (document.getElementById('post-slug') as HTMLInputElement)?.value.trim();
+
+    if (!title) {
+      showToast('Please provide an article title before saving.', 'error');
+      return;
+    }
+
+    if (!slug) slug = slugify(title);
+    if (!slug.endsWith('.md')) slug = `${slug}.md`;
+
+    const htmlContent = editor.getHTML();
+    const markdownBody = turndown.turndown(htmlContent);
+    const frontmatter = collectFrontmatter(isDraft);
+
+    const draftPill = document.getElementById('draft-status-pill');
+    const saveDraftBtn = document.getElementById('save-draft-btn');
+    const publishBtn = document.getElementById('publish-btn');
+
+    if (isDraft && saveDraftBtn) saveDraftBtn.textContent = 'Saving Draft...';
+    if (!isDraft && publishBtn) publishBtn.textContent = 'Publishing to Git...';
+
+    // Check if GitHub is connected
+    const config = getGitHubConfig();
+
+    if (config && config.token && config.owner && config.repo) {
+      try {
+        await commitPostToGitHub(config, slug, frontmatter as any, markdownBody);
+        
+        if (draftPill) {
+          draftPill.textContent = isDraft ? 'DRAFT SAVED TO GIT' : 'PUBLISHED TO GIT';
+          draftPill.className = isDraft
+            ? 'px-2 py-0.5 rounded text-[10px] bg-madder-soft text-madder-red border border-madder-light/40 font-bold'
+            : 'px-2 py-0.5 rounded text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold';
+        }
+
+        const msg = isDraft
+          ? `Draft successfully committed to GitHub (${config.owner}/${config.repo} at ${slug}) with draft: true!`
+          : `Monograph published to GitHub! Cloudflare Pages build triggered. Live in 30-60 seconds!`;
+
+        showToast(msg, 'success');
+      } catch (err: any) {
+        showToast(`GitHub commit error: ${err.message}`, 'error');
+      } finally {
+        if (saveDraftBtn) saveDraftBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg><span>Save Draft</span>`;
+        if (publishBtn) publishBtn.innerHTML = `<svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg><span>Publish to Production</span>`;
+      }
+    } else {
+      // Local Storage Fallback Mode
+      const fullMarkdown = serializeMarkdownWithFrontmatter(frontmatter as any, markdownBody);
+      localStorage.setItem(`draft_${slug}`, fullMarkdown);
+
+      if (draftPill) {
+        draftPill.textContent = isDraft ? 'DRAFT SAVED (LOCAL)' : 'SAVED (CONNECT GITHUB TO DEPLOY)';
+        draftPill.className = 'px-2 py-0.5 rounded text-[10px] bg-amber-100 text-amber-800 border border-amber-300 font-bold';
+      }
+
+      showToast(
+        `Saved to local storage! To commit directly to Git and trigger Cloudflare builds, click 'GitHub Settings' in the dashboard to connect your repo.`,
+        'info'
+      );
+
+      if (saveDraftBtn) saveDraftBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg><span>Save Draft</span>`;
+      if (publishBtn) publishBtn.innerHTML = `<svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg><span>Publish to Production</span>`;
+    }
+  }
+
+  document.getElementById('save-draft-btn')?.addEventListener('click', () => handleSave(true));
+  document.getElementById('publish-btn')?.addEventListener('click', () => handleSave(false));
+
+  // Initial count
+  updateWordCount();
+</script>

@@ -1,0 +1,114 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ColorAtlas from '../components/ColorAtlas.astro';
+
+const regions = [
+  {
+    name: 'Indus Valley & Sindh',
+    coordinates: "25°12' N, 68°51' E",
+    primaryDye: 'Indigofera tinctoria (True Indigo)',
+    description: 'Archaeological excavations at Mohenjo-daro reveal traces of madder and indigo mordant dyeing dating to 2500 BCE. Ancient artisans mastered anaerobic clay pot fermentations nourished with dates and slaked lime.',
+    swatchColor: '#2C4251',
+    swatchName: 'Indus Indigo',
+  },
+  {
+    name: 'Anatolian Plateau & Levant',
+    coordinates: "38°29' N, 35°44' E",
+    primaryDye: 'Rubia tinctorum (Common Madder)',
+    description: 'The volcanic, limestone-rich soils of Central Anatolia foster deep-rooted madder with exceptionally high alizarin concentrations. The guarded secrets of Adrianople (Turkey) Red originated in these trade crossroads.',
+    swatchColor: '#943D36',
+    swatchName: 'Anatolian Madder',
+  },
+  {
+    name: 'Provence & Southern Alps',
+    coordinates: "43°45' N, 4°49' E",
+    primaryDye: 'Reseda luteola (Weld / Dyer\'s Rocket)',
+    description: 'Dry limestone garrigues support wild weld colonies yielding luminous luteolin flavones. Combined with Mediterranean woad (Isatis tinctoria) and alum to weave the storied tapestries of medieval and Renaissance Europe.',
+    swatchColor: '#C98E3A',
+    swatchName: 'Provence Weld',
+  },
+  {
+    name: 'Aegean Archipelago & Kos',
+    coordinates: "36°50' N, 27°18' E",
+    primaryDye: 'Salvia officinalis & Quercus infectoria (Sage & Oak Gall)',
+    description: 'Sun-drenched Aegean hillsides supply concentrated polyphenols. Mixed with ferrous liquor, local weavers produce subtle botanical sages and slate-toned olive wools that echo coastal stones.',
+    swatchColor: '#5B7065',
+    swatchName: 'Aegean Sage',
+  },
+  {
+    name: 'Oaxaca Central Valleys',
+    coordinates: "17°04' N, 96°43' W",
+    primaryDye: 'Dactylopius coccus (Cochineal on Nopal)',
+    description: 'Cultivated on the nopales of Southern Mexico by Zapotec farmers, cochineal provided the Spanish empire with its most profitable global commodity after silver—yielding intense carminic scarlet.',
+    swatchColor: '#BA2D3C',
+    swatchName: 'Oaxacan Carmine',
+  },
+];
+---
+
+<BaseLayout
+  title="Material Map & Color Cartography | Geographies of Natural Dyes"
+  description="Explore the global cartography, historical trade routes, and biochemical signatures of natural dye plants."
+>
+  <div class="py-12 bg-parchment-base">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Page Header -->
+      <div class="max-w-3xl mb-12">
+        <div class="font-mono text-xs uppercase tracking-widest text-sage-botanical font-bold mb-2">
+          NATURAL COLOR CARTOGRAPHY
+        </div>
+        <h1 class="font-heading text-4xl sm:text-5xl md:text-6xl text-indigo-deep">
+          The Material Map
+        </h1>
+        <p class="font-body text-base sm:text-lg text-indigo-deep/80 mt-3 leading-relaxed">
+          Colors do not exist in a vacuum. Every natural pigment carries the mineral composition of its soil, the altitude of its climate, and the ingenuity of the human hands that learned to coax color from leaf, root, and insect.
+        </p>
+      </div>
+
+      <!-- Regional Cartography Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        {regions.map((region) => (
+          <div class="bg-parchment-light border border-parchment-border p-6 rounded-sm shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between border-b border-parchment-border pb-2.5 mb-4">
+                <span class="font-mono text-xs text-madder-red font-bold">
+                  {region.coordinates}
+                </span>
+                <span
+                  class="w-4 h-4 rounded-full border border-black/10 inline-block shadow-sm"
+                  style={`background-color: ${region.swatchColor};`}
+                ></span>
+              </div>
+
+              <h3 class="font-heading text-2xl text-indigo-deep">
+                {region.name}
+              </h3>
+              <p class="font-heading italic text-sm text-sage-botanical mt-1">
+                {region.primaryDye}
+              </p>
+
+              <p class="font-body text-sm text-indigo-deep/80 mt-4 leading-relaxed">
+                {region.description}
+              </p>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-parchment-border/60 flex items-center justify-between">
+              <span class="font-mono text-[11px] text-sage-botanical uppercase">
+                SPECIMEN SWATCH: {region.swatchName}
+              </span>
+              <span
+                class="w-6 h-6 swatch-pinked inline-block shadow-sm"
+                style={`background-color: ${region.swatchColor};`}
+              ></span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- Living Color Atlas Embedded Component -->
+      <ColorAtlas />
+
+    </div>
+  </div>
+</BaseLayout>

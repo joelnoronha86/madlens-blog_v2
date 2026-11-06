@@ -1,0 +1,626 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+// Get local collection posts to allow pre-populating on static build
+const posts = await getCollection('posts');
+const postsDataJson = JSON.stringify(
+  posts.map((p) => ({
+    name: p.id,
+    slug: p.id.replace(/\.md$/, ''),
+    body: p.body,
+    data: p.data,
+  }))
+);
+---
+
+<BaseLayout
+  title="Edit Field Monograph | Tiptap Writer Studio"
+  description="Edit, refine drafts, and update published natural dye research essays."
+>
+  <div class="py-8 bg-parchment-base min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Studio Header -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-parchment-border pb-5 mb-6">
+        <div>
+          <div class="flex items-center gap-2 font-mono text-xs text-sage-botanical uppercase tracking-wider mb-1">
+            <a href="/admin" class="hover:text-madder-red transition-colors">&larr; Back to Dashboard</a>
+            <span>&bull;</span>
+            <span id="draft-status-pill" class="px-2 py-0.5 rounded text-[10px] bg-amber-100 text-amber-800 border border-amber-300 font-bold">
+              EDITING
+            </span>
+          </div>
+          <h1 id="page-heading" class="font-heading text-3xl sm:text-4xl text-indigo-deep">
+            Edit Monograph
+          </h1>
+        </div>
+
+        <!-- Action Controls -->
+        <div class="flex flex-wrap items-center gap-2.5">
+          <!-- Live Preview Toggle -->
+          <button
+            id="toggle-preview-btn"
+            type="button"
+            class="px-3.5 py-2 rounded border border-indigo-deep/30 bg-parchment-light hover:bg-parchment-deep text-indigo-deep font-mono text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-sm"
+          >
+            <svg class="w-4 h-4 text-sage-botanical" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <span id="preview-toggle-text">Show Split Preview</span>
+          </button>
+
+          <!-- Save Draft Button -->
+          <button
+            id="save-draft-btn"
+            type="button"
+            class="px-4 py-2 rounded border border-madder-red/40 bg-madder-soft hover:bg-madder-red hover:text-parchment-light text-madder-red font-mono text-xs uppercase tracking-wider font-bold transition-all shadow-sm flex items-center gap-1.5"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+            </svg>
+            <span>Save as Draft</span>
+          </button>
+
+          <!-- Publish to Production Button -->
+          <button
+            id="publish-btn"
+            type="button"
+            class="px-5 py-2 rounded bg-indigo-deep hover:bg-emerald-800 text-parchment-light font-mono text-xs uppercase tracking-widest font-bold transition-all shadow-sm flex items-center gap-1.5"
+          >
+            <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>Publish to Production</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Toast Feedback Message -->
+      <div id="toast-msg" class="hidden mb-6 p-4 rounded-sm border font-mono text-xs transition-all shadow-sm"></div>
+
+      <!-- Main Editor Container -->
+      <div id="editor-grid" class="grid grid-cols-1 gap-8 items-start">
+        
+        <!-- Editor Column -->
+        <div id="editor-col" class="space-y-6">
+          
+          <!-- Article Metadata Form -->
+          <div class="bg-parchment-light border border-parchment-border p-6 rounded-sm shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b border-parchment-border pb-2.5">
+              <span class="font-mono text-xs uppercase tracking-widest text-sage-botanical font-bold">
+                ARTICLE TAXONOMY & METADATA
+              </span>
+              <span id="file-sha-badge" class="font-mono text-[11px] text-ink-muted"></span>
+            </div>
+
+            <!-- Title & Slug -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-mono text-xs uppercase text-sage-botanical mb-1 font-bold">Title</label>
+                <input
+                  id="post-title"
+                  type="text"
+                  class="w-full px-3.5 py-2 rounded border border-parchment-border bg-parchment-base font-heading text-lg sm:text-xl text-indigo-deep focus:outline-none focus:border-indigo-deep font-semibold"
+                  required
+                />
+              </div>
+
+              <div>
+                <label class="block font-mono text-xs uppercase text-sage-botanical mb-1 font-bold">File Name (.md)</label>
+                <input
+                  id="post-slug"
+                  type="text"
+                  readonly
+                  class="w-full px-3 py-2 rounded border border-parchment-border bg-parchment-deep text-ink-muted font-mono text-xs cursor-not-allowed"
+                />
+              </div>
+            </div>
+
+            <!-- Subtitle & Issue -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-mono text-xs uppercase text-sage-botanical mb-1">Subtitle</label>
+                <input
+                  id="post-subtitle"
+                  type="text"
+                  class="w-full px-3 py-2 rounded border border-parchment-border bg-parchment-base font-heading italic text-base text-indigo-deep focus:outline-none focus:border-indigo-deep"
+                />
+              </div>
+              <div>
+                <label class="block font-mono text-xs uppercase text-sage-botanical mb-1">Issue Badge</label>
+                <input
+                  id="post-issue"
+                  type="text"
+                  class="w-full px-3 py-2 rounded border border-parchment-border bg-parchment-base font-mono text-xs text-indigo-deep focus:outline-none focus:border-indigo-deep"
+                />
+              </div>
+            </div>
+
+            <!-- Excerpt -->
+            <div>
+              <label class="block font-mono text-xs uppercase text-sage-botanical mb-1 font-bold">Excerpt / Abstract</label>
+              <textarea
+                id="post-excerpt"
+                rows="2"
+                class="w-full px-3 py-2 rounded border border-parchment-border bg-parchment-base font-body text-sm text-indigo-deep focus:outline-none focus:border-indigo-deep leading-relaxed"
+              ></textarea>
+            </div>
+
+            <!-- Specimen & Cartography Details -->
+            <details class="pt-2 border-t border-parchment-border/60" open>
+              <summary class="font-mono text-xs uppercase text-indigo-deep cursor-pointer font-bold hover:text-madder-red transition-colors py-1">
+                Specimen, Coordinates & Chemical Data
+              </summary>
+              <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+                <div>
+                  <label class="block font-mono text-[11px] uppercase text-sage-botanical mb-1">Specimen Botanical Name</label>
+                  <input
+                    id="specimen-name"
+                    type="text"
+                    class="w-full px-3 py-1.5 rounded border border-parchment-border bg-parchment-base font-mono text-xs text-indigo-deep"
+                  />
+                </div>
+                <div>
+                  <label class="block font-mono text-[11px] uppercase text-sage-botanical mb-1">Coordinates</label>
+                  <input
+                    id="specimen-coordinates"
+                    type="text"
+                    class="w-full px-3 py-1.5 rounded border border-parchment-border bg-parchment-base font-mono text-xs text-indigo-deep"
+                  />
+                </div>
+                <div>
+                  <label class="block font-mono text-[11px] uppercase text-sage-botanical mb-1">Origin Archive</label>
+                  <input
+                    id="specimen-origin"
+                    type="text"
+                    class="w-full px-3 py-1.5 rounded border border-parchment-border bg-parchment-base font-mono text-xs text-indigo-deep"
+                  />
+                </div>
+                <div>
+                  <label class="block font-mono text-[11px] uppercase text-sage-botanical mb-1">Chemical Chromophore</label>
+                  <input
+                    id="specimen-chemical"
+                    type="text"
+                    class="w-full px-3 py-1.5 rounded border border-parchment-border bg-parchment-base font-mono text-xs text-indigo-deep"
+                  />
+                </div>
+              </div>
+
+              <!-- Tags and Cover -->
+              <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block font-mono text-[11px] uppercase text-sage-botanical mb-1">Tags (comma-separated)</label>
+                  <input
+                    id="post-tags"
+                    type="text"
+                    class="w-full px-3 py-1.5 rounded border border-parchment-border bg-parchment-base font-mono text-xs text-indigo-deep"
+                  />
+                </div>
+                <div>
+                  <label class="block font-mono text-[11px] uppercase text-sage-botanical mb-1">Cover Image URL</label>
+                  <input
+                    id="post-cover"
+                    type="text"
+                    class="w-full px-3 py-1.5 rounded border border-parchment-border bg-parchment-base font-mono text-xs text-indigo-deep"
+                  />
+                </div>
+              </div>
+            </details>
+          </div>
+
+          <!-- Tiptap Editor & Toolbar -->
+          <div class="bg-parchment-light border border-parchment-border rounded-sm shadow-sm overflow-hidden">
+            
+            <div id="tiptap-toolbar" class="border-b border-parchment-border bg-parchment-deep/70 p-2 sm:p-3 flex flex-wrap items-center gap-1.5 font-mono text-xs">
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent font-bold" data-action="bold" title="Bold (Cmd+B)">
+                <strong>B</strong>
+              </button>
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent italic" data-action="italic" title="Italic (Cmd+I)">
+                <em>I</em>
+              </button>
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent line-through" data-action="strike" title="Strikethrough">
+                S
+              </button>
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent font-mono" data-action="code" title="Inline Code">
+                &lt;/&gt;
+              </button>
+
+              <span class="w-px h-5 bg-parchment-border mx-1"></span>
+
+              <button type="button" class="tb-btn px-2 py-1 rounded hover:bg-parchment-base border border-transparent font-heading font-bold" data-action="h1" title="Heading 1">
+                H1
+              </button>
+              <button type="button" class="tb-btn px-2 py-1 rounded hover:bg-parchment-base border border-transparent font-heading font-bold" data-action="h2" title="Heading 2">
+                H2
+              </button>
+              <button type="button" class="tb-btn px-2 py-1 rounded hover:bg-parchment-base border border-transparent font-heading font-bold" data-action="h3" title="Heading 3">
+                H3
+              </button>
+              <button type="button" class="tb-btn px-2 py-1 rounded hover:bg-parchment-base border border-transparent" data-action="paragraph" title="Paragraph">
+                P
+              </button>
+
+              <span class="w-px h-5 bg-parchment-border mx-1"></span>
+
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent" data-action="bulletList" title="Bullet List">
+                &bull; List
+              </button>
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent" data-action="orderedList" title="Ordered List">
+                1. List
+              </button>
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent font-heading italic" data-action="blockquote" title="Blockquote">
+                &ldquo; Quote
+              </button>
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent" data-action="codeBlock" title="Code Block">
+                [Pre]
+              </button>
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent" data-action="hr" title="Horizontal Rule">
+                &mdash; HR
+              </button>
+
+              <span class="w-px h-5 bg-parchment-border mx-1"></span>
+
+              <button type="button" class="tb-btn px-2 py-1 rounded hover:bg-parchment-base border border-transparent text-indigo-deep flex items-center gap-1" data-action="image" title="Insert Image">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span>Image</span>
+              </button>
+              <button type="button" class="tb-btn px-2 py-1 rounded hover:bg-parchment-base border border-transparent text-indigo-deep flex items-center gap-1" data-action="link" title="Insert Link">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+                <span>Link</span>
+              </button>
+
+              <span class="w-px h-5 bg-parchment-border mx-1"></span>
+
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent" data-action="undo" title="Undo">
+                &larr;
+              </button>
+              <button type="button" class="tb-btn p-1.5 rounded hover:bg-parchment-base border border-transparent" data-action="redo" title="Redo">
+                &rarr;
+              </button>
+            </div>
+
+            <div id="tiptap-editor-container" class="p-6 sm:p-8 min-h-[420px] bg-parchment-light">
+              <div id="tiptap-editor-element"></div>
+            </div>
+
+            <div class="px-6 py-2.5 bg-parchment-deep/40 border-t border-parchment-border flex items-center justify-between font-mono text-[11px] text-sage-botanical">
+              <span id="word-count">0 words</span>
+              <span>Editing Active Post</span>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Live Split Preview Column -->
+        <div id="preview-col" class="hidden space-y-6">
+          <div class="bg-parchment-light border border-parchment-border p-6 rounded-sm shadow-sm sticky top-28 max-h-[85vh] overflow-y-auto">
+            <div class="border-b border-parchment-border pb-3 mb-6 flex items-center justify-between">
+              <span class="font-mono text-xs uppercase tracking-widest text-madder-red font-bold">
+                ✦ LIVE FIELD ESSAY PREVIEW ✦
+              </span>
+              <span class="font-mono text-[10px] text-sage-botanical">ASTRO LAYOUT MIRROR</span>
+            </div>
+
+            <div class="space-y-3 mb-6">
+              <span id="prev-issue" class="font-mono text-xs text-madder-red font-bold block uppercase"></span>
+              <h2 id="prev-title" class="font-heading text-3xl text-indigo-deep font-semibold"></h2>
+              <p id="prev-subtitle" class="font-heading italic text-lg text-sage-botanical"></p>
+            </div>
+
+            <div id="prev-body" class="prose prose-sm text-indigo-deep font-body leading-relaxed drop-cap border-t border-parchment-border pt-4">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</BaseLayout>
+
+<script define:vars={{ postsDataJson }}>
+  // @ts-ignore
+  window.__LOCAL_POSTS__ = JSON.parse(postsDataJson);
+</script>
+
+<script>
+  import { Editor } from '@tiptap/core';
+  import StarterKit from '@tiptap/starter-kit';
+  import Image from '@tiptap/extension-image';
+  import Link from '@tiptap/extension-link';
+  import Placeholder from '@tiptap/extension-placeholder';
+  import TurndownService from 'turndown';
+  import { marked } from 'marked';
+  import { getGitHubConfig, commitPostToGitHub, parseMarkdownWithFrontmatter, base64ToUtf8 } from '../../utils/github';
+
+  const localPosts: any[] = (window as any).__LOCAL_POSTS__ || [];
+
+  const turndown = new TurndownService({
+    headingStyle: 'atx',
+    codeBlockStyle: 'fenced',
+    emDelimiter: '*',
+  });
+
+  let existingSha: string | undefined = undefined;
+
+  // Initialize Tiptap
+  const editor = new Editor({
+    element: document.querySelector('#tiptap-editor-element') as HTMLElement,
+    extensions: [
+      StarterKit,
+      Image,
+      Link.configure({ openOnClick: false }),
+      Placeholder.configure({
+        placeholder: 'Loading article content...',
+      }),
+    ],
+    content: '<p>Loading article content...</p>',
+    onUpdate: () => {
+      updateWordCount();
+      updateLivePreview();
+    },
+  });
+
+  // Wire toolbar buttons
+  const toolbar = document.getElementById('tiptap-toolbar');
+  toolbar?.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('.tb-btn') as HTMLElement | null;
+    if (!btn || !editor) return;
+
+    const action = btn.getAttribute('data-action');
+    editor.chain().focus();
+
+    switch (action) {
+      case 'bold': editor.chain().focus().toggleBold().run(); break;
+      case 'italic': editor.chain().focus().toggleItalic().run(); break;
+      case 'strike': editor.chain().focus().toggleStrike().run(); break;
+      case 'code': editor.chain().focus().toggleCode().run(); break;
+      case 'h1': editor.chain().focus().toggleHeading({ level: 1 }).run(); break;
+      case 'h2': editor.chain().focus().toggleHeading({ level: 2 }).run(); break;
+      case 'h3': editor.chain().focus().toggleHeading({ level: 3 }).run(); break;
+      case 'paragraph': editor.chain().focus().setParagraph().run(); break;
+      case 'bulletList': editor.chain().focus().toggleBulletList().run(); break;
+      case 'orderedList': editor.chain().focus().toggleOrderedList().run(); break;
+      case 'blockquote': editor.chain().focus().toggleBlockquote().run(); break;
+      case 'codeBlock': editor.chain().focus().toggleCodeBlock().run(); break;
+      case 'hr': editor.chain().focus().setHorizontalRule().run(); break;
+      case 'undo': editor.chain().focus().undo().run(); break;
+      case 'redo': editor.chain().focus().redo().run(); break;
+      case 'image': {
+        const url = prompt('Enter image URL or path:');
+        if (url) editor.chain().focus().setImage({ src: url }).run();
+        break;
+      }
+      case 'link': {
+        const url = prompt('Enter link URL:');
+        if (url) editor.chain().focus().setLink({ href: url }).run();
+        break;
+      }
+    }
+  });
+
+  function updateWordCount() {
+    const text = editor.getText();
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+    const wordCountEl = document.getElementById('word-count');
+    if (wordCountEl) wordCountEl.textContent = `${words} words`;
+  }
+
+  // Load Post Content
+  async function loadPostData() {
+    const params = new URLSearchParams(window.location.search);
+    const filename = params.get('file') || params.get('slug');
+
+    if (!filename) {
+      alert('No post filename specified.');
+      window.location.href = '/admin';
+      return;
+    }
+
+    const cleanFilename = filename.endsWith('.md') ? filename : `${filename}.md`;
+
+    // 1. Try finding in local collection
+    const match = localPosts.find(p => p.name === cleanFilename || p.slug === filename);
+
+    if (match) {
+      populateFields(match.data, match.body, cleanFilename);
+    }
+
+    // 2. Also check GitHub if connected for the most updated version and SHA
+    const config = getGitHubConfig();
+    if (config && config.token && config.owner && config.repo) {
+      try {
+        const cleanPath = config.postsPath.replace(/^\/+|\/+$/g, '');
+        const url = `https://api.github.com/repos/${config.owner}/${config.repo}/contents/${cleanPath}/${cleanFilename}?ref=${config.branch}`;
+        const res = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${config.token}`,
+            Accept: 'application/vnd.github.v3+json',
+          },
+        });
+
+        if (res.ok) {
+          const gitData = await res.json();
+          existingSha = gitData.sha;
+          const decoded = base64ToUtf8(gitData.content);
+          const { frontmatter, body } = parseMarkdownWithFrontmatter(decoded);
+          populateFields(frontmatter, body, cleanFilename, gitData.sha);
+        }
+      } catch (err) {
+        console.warn('Could not fetch from GitHub, using local fallback:', err);
+      }
+    }
+  }
+
+  async function populateFields(fm: any, markdownBody: string, filename: string, sha?: string) {
+    (document.getElementById('post-slug') as HTMLInputElement).value = filename;
+    (document.getElementById('post-title') as HTMLInputElement).value = fm.title || '';
+    if (fm.subtitle) (document.getElementById('post-subtitle') as HTMLInputElement).value = fm.subtitle;
+    if (fm.issue) (document.getElementById('post-issue') as HTMLInputElement).value = fm.issue;
+    if (fm.excerpt) (document.getElementById('post-excerpt') as HTMLTextAreaElement).value = fm.excerpt;
+    if (fm.tags) (document.getElementById('post-tags') as HTMLInputElement).value = Array.isArray(fm.tags) ? fm.tags.join(', ') : fm.tags;
+    if (fm.coverImage) (document.getElementById('post-cover') as HTMLInputElement).value = fm.coverImage;
+
+    if (fm.specimen) {
+      if (fm.specimen.name) (document.getElementById('specimen-name') as HTMLInputElement).value = fm.specimen.name;
+      if (fm.specimen.coordinates) (document.getElementById('specimen-coordinates') as HTMLInputElement).value = fm.specimen.coordinates;
+      if (fm.specimen.origin) (document.getElementById('specimen-origin') as HTMLInputElement).value = fm.specimen.origin;
+      if (fm.specimen.chemicalStructure) {
+        (document.getElementById('specimen-chemical') as HTMLInputElement).value = `${fm.specimen.chemicalStructure.name} (${fm.specimen.chemicalStructure.formula})`;
+      }
+    }
+
+    const shaBadge = document.getElementById('file-sha-badge');
+    if (shaBadge && sha) {
+      shaBadge.textContent = `GIT SHA: ${sha.slice(0, 7)}`;
+    }
+
+    const draftPill = document.getElementById('draft-status-pill');
+    if (draftPill) {
+      draftPill.textContent = fm.draft ? 'DRAFT' : 'PUBLISHED';
+      draftPill.className = fm.draft
+        ? 'px-2 py-0.5 rounded text-[10px] bg-madder-soft text-madder-red border border-madder-light/40 font-bold'
+        : 'px-2 py-0.5 rounded text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold';
+    }
+
+    // Convert markdown to HTML and load into Tiptap
+    const html = await marked.parse(markdownBody || '');
+    editor.commands.setContent(html);
+    updateWordCount();
+  }
+
+  // Live Split Preview
+  const togglePreviewBtn = document.getElementById('toggle-preview-btn');
+  const previewCol = document.getElementById('preview-col');
+  const editorGrid = document.getElementById('editor-grid');
+  const previewText = document.getElementById('preview-toggle-text');
+  let isPreviewOpen = false;
+
+  function updateLivePreview() {
+    if (!isPreviewOpen) return;
+    const title = (document.getElementById('post-title') as HTMLInputElement)?.value || '';
+    const subtitle = (document.getElementById('post-subtitle') as HTMLInputElement)?.value || '';
+    const issue = (document.getElementById('post-issue') as HTMLInputElement)?.value || '';
+
+    const pTitle = document.getElementById('prev-title');
+    const pSub = document.getElementById('prev-subtitle');
+    const pIssue = document.getElementById('prev-issue');
+    const pBody = document.getElementById('prev-body');
+
+    if (pTitle) pTitle.textContent = title;
+    if (pSub) pSub.textContent = subtitle;
+    if (pIssue) pIssue.textContent = issue;
+    if (pBody && editor) pBody.innerHTML = editor.getHTML();
+  }
+
+  togglePreviewBtn?.addEventListener('click', () => {
+    isPreviewOpen = !isPreviewOpen;
+    if (isPreviewOpen) {
+      previewCol?.classList.remove('hidden');
+      editorGrid?.classList.remove('grid-cols-1');
+      editorGrid?.classList.add('grid-cols-1', 'lg:grid-cols-2');
+      if (previewText) previewText.textContent = 'Hide Split Preview';
+      updateLivePreview();
+    } else {
+      previewCol?.classList.add('hidden');
+      editorGrid?.classList.add('grid-cols-1');
+      editorGrid?.classList.remove('lg:grid-cols-2');
+      if (previewText) previewText.textContent = 'Show Split Preview';
+    }
+  });
+
+  function showToast(msg: string, type: 'success' | 'error' | 'info') {
+    const toast = document.getElementById('toast-msg');
+    if (!toast) return;
+
+    toast.textContent = msg;
+    toast.className = `p-4 rounded-sm border font-mono text-xs shadow-sm block ${
+      type === 'success' ? 'bg-emerald-50 text-emerald-800 border-emerald-300' :
+      type === 'error' ? 'bg-red-50 text-red-800 border-red-300' :
+      'bg-indigo-soft text-indigo-deep border-indigo-deep/30'
+    }`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Save / Publish
+  async function handleUpdate(isDraft: boolean) {
+    const filename = (document.getElementById('post-slug') as HTMLInputElement).value;
+    const title = (document.getElementById('post-title') as HTMLInputElement).value.trim();
+    const subtitle = (document.getElementById('post-subtitle') as HTMLInputElement).value.trim();
+    const issue = (document.getElementById('post-issue') as HTMLInputElement).value.trim();
+    const excerpt = (document.getElementById('post-excerpt') as HTMLTextAreaElement).value.trim();
+    const tagsRaw = (document.getElementById('post-tags') as HTMLInputElement).value.trim();
+    const coverImage = (document.getElementById('post-cover') as HTMLInputElement).value.trim();
+    const specimenName = (document.getElementById('specimen-name') as HTMLInputElement).value.trim();
+    const coordinates = (document.getElementById('specimen-coordinates') as HTMLInputElement).value.trim();
+    const origin = (document.getElementById('specimen-origin') as HTMLInputElement).value.trim();
+    const chemical = (document.getElementById('specimen-chemical') as HTMLInputElement).value.trim();
+
+    const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+    const frontmatter: any = {
+      title,
+      subtitle: subtitle || undefined,
+      excerpt: excerpt || title,
+      author: 'Dr. E. Archer',
+      pubDate: new Date().toISOString().split('T')[0],
+      issue: issue || 'FIELD LOG // NATURAL DYES',
+      draft: isDraft,
+      tags,
+      specimen: specimenName ? {
+        name: specimenName,
+        origin: origin || undefined,
+        coordinates: coordinates || undefined,
+        chemicalStructure: chemical ? {
+          name: chemical.split('(')[0].trim(),
+          formula: chemical.includes('(') ? chemical.split('(')[1].replace(')', '').trim() : 'Active Molecule',
+        } : undefined,
+      } : undefined,
+      coverImage: coverImage || undefined,
+    };
+
+    const htmlContent = editor.getHTML();
+    const markdownBody = turndown.turndown(htmlContent);
+
+    const config = getGitHubConfig();
+
+    if (config && config.token && config.owner && config.repo) {
+      try {
+        const result = await commitPostToGitHub(config, filename, frontmatter, markdownBody, existingSha);
+        existingSha = result.commit?.sha || existingSha;
+
+        showToast(
+          isDraft
+            ? `Draft successfully updated on GitHub with draft: true!`
+            : `Updated and published to GitHub! Cloudflare Pages build triggered.`,
+          'success'
+        );
+
+        const draftPill = document.getElementById('draft-status-pill');
+        if (draftPill) {
+          draftPill.textContent = isDraft ? 'DRAFT (GIT)' : 'PUBLISHED (GIT)';
+          draftPill.className = isDraft
+            ? 'px-2 py-0.5 rounded text-[10px] bg-madder-soft text-madder-red border border-madder-light/40 font-bold'
+            : 'px-2 py-0.5 rounded text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold';
+        }
+      } catch (err: any) {
+        showToast(`GitHub commit error: ${err.message}`, 'error');
+      }
+    } else {
+      showToast('Connect GitHub in the dashboard to push changes directly to your repository.', 'info');
+    }
+  }
+
+  document.getElementById('save-draft-btn')?.addEventListener('click', () => handleUpdate(true));
+  document.getElementById('publish-btn')?.addEventListener('click', () => handleUpdate(false));
+
+  // Initialize
+  loadPostData();
+</script>

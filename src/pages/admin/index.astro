@@ -1,0 +1,594 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+// Get local collection posts as initial data
+const localPosts = await getCollection('posts');
+const initialPostsJson = JSON.stringify(
+  localPosts.map((p) => ({
+    name: p.id,
+    slug: p.id.replace(/\.md$/, ''),
+    title: p.data.title,
+    date: p.data.pubDate.toISOString().split('T')[0],
+    isDraft: Boolean(p.data.draft),
+    author: p.data.author,
+    tags: p.data.tags,
+    specimen: p.data.specimen?.name || '',
+    coordinates: p.data.specimen?.coordinates || '',
+  }))
+);
+---
+
+<BaseLayout
+  title="Writer Studio & Admin Dashboard | Geographies of Natural Dyes"
+  description="Manage, compose, save drafts, and publish research essays to production."
+>
+  <div class="py-10 bg-parchment-base min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Top Studio Header -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-parchment-border pb-6 mb-8">
+        <div>
+          <div class="flex items-center gap-2 font-mono text-xs text-sage-botanical uppercase tracking-wider mb-1">
+            <span>WRITER STUDIO</span>
+            <span>&bull;</span>
+            <span id="connection-badge" class="px-2 py-0.5 rounded text-[10px] bg-parchment-deep text-indigo-deep border border-parchment-border">
+              CHECKING CONNECTION...
+            </span>
+          </div>
+          <h1 class="font-heading text-3xl sm:text-4xl text-indigo-deep">
+            Editorial Dashboard
+          </h1>
+          <p class="font-body text-xs sm:text-sm text-indigo-deep/80 mt-1">
+            Direct GitHub-backed headless repository CMS. Saves drafts & commits markdown directly to Git.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button
+            id="open-auth-modal-btn"
+            type="button"
+            class="px-4 py-2 rounded border border-indigo-deep/30 bg-parchment-light hover:bg-parchment-deep text-indigo-deep font-mono text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-sm"
+          >
+            <svg class="w-4 h-4 text-indigo-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span id="auth-btn-label">GitHub Settings</span>
+          </button>
+
+          <a
+            href="/admin/new"
+            class="px-5 py-2 rounded bg-indigo-deep hover:bg-madder-red text-parchment-light font-mono text-xs uppercase tracking-widest font-bold transition-all shadow-sm flex items-center gap-2"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Write New Article</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Stats & Status Banner -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div class="bg-parchment-light border border-parchment-border p-4 rounded-sm shadow-sm">
+          <span class="font-mono text-[11px] text-sage-botanical uppercase tracking-wider block">ALL ARTICLES</span>
+          <div id="stat-total" class="font-heading text-3xl text-indigo-deep font-bold mt-1">-</div>
+        </div>
+        <div class="bg-parchment-light border border-parchment-border p-4 rounded-sm shadow-sm">
+          <span class="font-mono text-[11px] text-sage-botanical uppercase tracking-wider block">PUBLISHED ON PRODUCTION</span>
+          <div id="stat-published" class="font-heading text-3xl text-indigo-deep font-bold mt-1 text-emerald-800">-</div>
+        </div>
+        <div class="bg-parchment-light border border-parchment-border p-4 rounded-sm shadow-sm">
+          <span class="font-mono text-[11px] text-sage-botanical uppercase tracking-wider block">DRAFTS (IN PROGRESS)</span>
+          <div id="stat-drafts" class="font-heading text-3xl text-madder-red font-bold mt-1">-</div>
+        </div>
+      </div>
+
+      <!-- Action & Filter Bar -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            class="filter-status-btn px-3 py-1.5 rounded font-mono text-xs uppercase tracking-wider bg-indigo-deep text-parchment-light"
+            data-filter="all"
+          >
+            All Posts
+          </button>
+          <button
+            type="button"
+            class="filter-status-btn px-3 py-1.5 rounded font-mono text-xs uppercase tracking-wider bg-parchment-light text-indigo-deep border border-parchment-border hover:border-indigo-deep"
+            data-filter="published"
+          >
+            Published
+          </button>
+          <button
+            type="button"
+            class="filter-status-btn px-3 py-1.5 rounded font-mono text-xs uppercase tracking-wider bg-parchment-light text-indigo-deep border border-parchment-border hover:border-indigo-deep"
+            data-filter="draft"
+          >
+            Drafts Only
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            id="refresh-posts-btn"
+            type="button"
+            class="font-mono text-xs text-sage-botanical hover:text-indigo-deep flex items-center gap-1 p-1.5"
+            title="Refresh repository files"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>Sync with Git</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Posts Table -->
+      <div class="bg-parchment-light border border-parchment-border rounded-sm shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-parchment-border bg-parchment-deep/50 font-mono text-[11px] text-sage-botanical uppercase tracking-wider">
+                <th class="py-3 px-4 sm:px-6">Status</th>
+                <th class="py-3 px-4 sm:px-6">Article Title & Specimen</th>
+                <th class="py-3 px-4 sm:px-6 hidden md:table-cell">File Name</th>
+                <th class="py-3 px-4 sm:px-6 hidden sm:table-cell">Date</th>
+                <th class="py-3 px-4 sm:px-6 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="posts-table-body" class="divide-y divide-parchment-border/60 font-mono text-xs">
+              <!-- Populated via script -->
+            </tbody>
+          </table>
+        </div>
+
+        <div id="loading-spinner" class="py-12 text-center text-sage-botanical font-mono text-xs">
+          Loading repository files...
+        </div>
+      </div>
+
+      <!-- Cloudflare Continuous Deployment Guide Card -->
+      <div class="mt-12 p-6 bg-parchment-deep/40 border border-parchment-border rounded-sm">
+        <h3 class="font-heading text-xl text-indigo-deep font-bold mb-2">
+          How Publishing to Production Works
+        </h3>
+        <p class="font-body text-xs sm:text-sm text-indigo-deep/90 leading-relaxed">
+          1. <strong>Saving a Draft</strong> commits markdown to <code class="bg-parchment-base px-1.5 py-0.5 rounded text-indigo-deep">src/content/posts/</code> with <code class="bg-parchment-base px-1.5 py-0.5 rounded text-madder-red">draft: true</code>.<br />
+          2. <strong>Publishing</strong> commits with <code class="bg-parchment-base px-1.5 py-0.5 rounded text-emerald-800">draft: false</code>.<br />
+          3. <strong>Cloudflare Pages</strong> detects the git push and automatically runs <code class="bg-parchment-base px-1.5 py-0.5 rounded text-indigo-deep">astro build</code> to publish your changes worldwide in 30–60 seconds!
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- GitHub Setup Modal -->
+  <div id="auth-modal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-parchment-light border border-parchment-border max-w-lg w-full rounded-sm shadow-2xl p-6 sm:p-8 space-y-6">
+      <div class="flex items-center justify-between border-b border-parchment-border pb-3">
+        <h2 class="font-heading text-2xl text-indigo-deep font-semibold">
+          GitHub Repository Authentication
+        </h2>
+        <button id="close-auth-modal-btn" type="button" class="text-ink-muted hover:text-indigo-deep">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <p class="font-body text-xs text-indigo-deep/80 leading-relaxed">
+        Connect your GitHub repository so the browser can directly create drafts, update posts, and trigger Cloudflare deployments with no separate backend server required.
+      </p>
+
+      <form id="auth-form" class="space-y-4 font-mono text-xs">
+        <div>
+          <label class="block text-sage-botanical uppercase mb-1 font-bold">
+            GitHub Personal Access Token (PAT)
+          </label>
+          <input
+            id="cfg-token"
+            type="password"
+            placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+            class="w-full px-3 py-2 rounded border border-parchment-border bg-parchment-base text-indigo-deep focus:outline-none focus:border-indigo-deep"
+          />
+          <span class="text-[10px] text-ink-muted mt-1 block">
+            Needs <code class="bg-parchment-deep px-1 rounded">repo</code> scope. Stored strictly in your browser's local storage.
+          </span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sage-botanical uppercase mb-1 font-bold">Repository Owner / Org</label>
+            <input
+              id="cfg-owner"
+              type="text"
+              placeholder="e.g. your-github-username"
+              class="w-full px-3 py-2 rounded border border-parchment-border bg-parchment-base text-indigo-deep focus:outline-none focus:border-indigo-deep"
+            />
+          </div>
+          <div>
+            <label class="block text-sage-botanical uppercase mb-1 font-bold">Repository Name</label>
+            <input
+              id="cfg-repo"
+              type="text"
+              placeholder="e.g. madlens-blog_v2"
+              class="w-full px-3 py-2 rounded border border-parchment-border bg-parchment-base text-indigo-deep focus:outline-none focus:border-indigo-deep"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sage-botanical uppercase mb-1 font-bold">Branch</label>
+            <input
+              id="cfg-branch"
+              type="text"
+              value="main"
+              class="w-full px-3 py-2 rounded border border-parchment-border bg-parchment-base text-indigo-deep focus:outline-none focus:border-indigo-deep"
+            />
+          </div>
+          <div>
+            <label class="block text-sage-botanical uppercase mb-1 font-bold">Posts Path</label>
+            <input
+              id="cfg-path"
+              type="text"
+              value="src/content/posts"
+              class="w-full px-3 py-2 rounded border border-parchment-border bg-parchment-base text-indigo-deep focus:outline-none focus:border-indigo-deep"
+            />
+          </div>
+        </div>
+
+        <div id="auth-status-msg" class="hidden p-2.5 rounded font-mono text-xs"></div>
+
+        <div class="pt-4 flex items-center justify-between border-t border-parchment-border">
+          <button
+            id="disconnect-btn"
+            type="button"
+            class="text-madder-red hover:underline text-xs"
+          >
+            Clear Credentials
+          </button>
+
+          <div class="flex items-center gap-2">
+            <button
+              id="test-save-btn"
+              type="submit"
+              class="px-5 py-2 rounded bg-indigo-deep text-parchment-light uppercase tracking-wider font-bold hover:bg-madder-red transition-all"
+            >
+              Save & Test Connection
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</BaseLayout>
+
+<script define:vars={{ initialPostsJson }}>
+  // @ts-ignore
+  const initialPosts = JSON.parse(initialPostsJson);
+  let posts = [...initialPosts];
+  let activeFilter = 'all';
+
+  const STORAGE_KEY = 'geographies_blog_github_config';
+
+  function getStoredConfig() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function updateConnectionBadge() {
+    const badge = document.getElementById('connection-badge');
+    const authBtnLabel = document.getElementById('auth-btn-label');
+    const config = getStoredConfig();
+
+    if (config && config.token && config.owner && config.repo) {
+      if (badge) {
+        badge.textContent = `CONNECTED: ${config.owner}/${config.repo} (${config.branch})`;
+        badge.className = 'px-2 py-0.5 rounded text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold';
+      }
+      if (authBtnLabel) authBtnLabel.textContent = 'GitHub: Connected';
+    } else {
+      if (badge) {
+        badge.textContent = 'OFFLINE / LOCAL STORAGE MODE';
+        badge.className = 'px-2 py-0.5 rounded text-[10px] bg-amber-100 text-amber-800 border border-amber-300';
+      }
+      if (authBtnLabel) authBtnLabel.textContent = 'Connect GitHub';
+    }
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('posts-table-body');
+    const loading = document.getElementById('loading-spinner');
+    const statTotal = document.getElementById('stat-total');
+    const statPublished = document.getElementById('stat-published');
+    const statDrafts = document.getElementById('stat-drafts');
+
+    if (loading) loading.classList.add('hidden');
+
+    const total = posts.length;
+    const publishedCount = posts.filter(p => !p.isDraft).length;
+    const draftCount = posts.filter(p => p.isDraft).length;
+
+    if (statTotal) statTotal.textContent = total.toString();
+    if (statPublished) statPublished.textContent = publishedCount.toString();
+    if (statDrafts) statDrafts.textContent = draftCount.toString();
+
+    const filtered = posts.filter(p => {
+      if (activeFilter === 'draft') return p.isDraft;
+      if (activeFilter === 'published') return !p.isDraft;
+      return true;
+    });
+
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="py-8 text-center text-sage-botanical">
+            No posts found matching filter "${activeFilter}".
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    filtered.forEach(p => {
+      const tr = document.createElement('tr');
+      tr.className = 'hover:bg-parchment-base/70 transition-colors';
+
+      const statusBadge = p.isDraft
+        ? `<span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-madder-soft text-madder-red border border-madder-light/40">DRAFT</span>`
+        : `<span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">PUBLISHED</span>`;
+
+      tr.innerHTML = `
+        <td class="py-4 px-4 sm:px-6 whitespace-nowrap">${statusBadge}</td>
+        <td class="py-4 px-4 sm:px-6">
+          <div class="font-heading text-lg sm:text-xl font-bold text-indigo-deep hover:text-madder-red">
+            <a href="/admin/edit?file=${encodeURIComponent(p.name)}">${p.title}</a>
+          </div>
+          ${p.specimen ? `<div class="font-heading italic text-xs text-sage-botanical">${p.specimen} ${p.coordinates ? `&bull; ${p.coordinates}` : ''}</div>` : ''}
+        </td>
+        <td class="py-4 px-4 sm:px-6 hidden md:table-cell text-sage-botanical text-xs">
+          ${p.name}
+        </td>
+        <td class="py-4 px-4 sm:px-6 hidden sm:table-cell text-sage-botanical text-xs whitespace-nowrap">
+          ${p.date || '—'}
+        </td>
+        <td class="py-4 px-4 sm:px-6 text-right whitespace-nowrap">
+          <div class="flex items-center justify-end gap-2">
+            <a
+              href="/admin/preview/${p.slug}"
+              class="px-2.5 py-1 rounded border border-indigo-deep/30 bg-parchment-base hover:bg-indigo-deep hover:text-parchment-light text-indigo-deep text-[11px] uppercase tracking-wider"
+              title="Preview in full layout"
+            >
+              Preview
+            </a>
+            <a
+              href="/admin/edit?file=${encodeURIComponent(p.name)}"
+              class="px-2.5 py-1 rounded bg-indigo-deep hover:bg-madder-red text-parchment-light text-[11px] uppercase tracking-wider font-bold"
+            >
+              Edit
+            </a>
+          </div>
+        </td>
+      `;
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Filter buttons
+  const filterBtns = document.querySelectorAll('.filter-status-btn');
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => {
+        b.classList.remove('bg-indigo-deep', 'text-parchment-light');
+        b.classList.add('bg-parchment-light', 'text-indigo-deep', 'border', 'border-parchment-border');
+      });
+      btn.classList.add('bg-indigo-deep', 'text-parchment-light');
+      btn.classList.remove('bg-parchment-light', 'text-indigo-deep', 'border', 'border-parchment-border');
+
+      activeFilter = btn.getAttribute('data-filter') || 'all';
+      renderTable();
+    });
+  });
+
+  // Modal interactions
+  const authModal = document.getElementById('auth-modal');
+  const openAuthBtn = document.getElementById('open-auth-modal-btn');
+  const closeAuthBtn = document.getElementById('close-auth-modal-btn');
+  const authForm = document.getElementById('auth-form');
+  const disconnectBtn = document.getElementById('disconnect-btn');
+
+  function openModal() {
+    const config = getStoredConfig() || { token: '', owner: '', repo: '', branch: 'main', postsPath: 'src/content/posts' };
+    const tInput = document.getElementById('cfg-token');
+    const oInput = document.getElementById('cfg-owner');
+    const rInput = document.getElementById('cfg-repo');
+    const bInput = document.getElementById('cfg-branch');
+    const pInput = document.getElementById('cfg-path');
+
+    if (tInput) tInput.value = config.token || '';
+    if (oInput) oInput.value = config.owner || '';
+    if (rInput) rInput.value = config.repo || '';
+    if (bInput) bInput.value = config.branch || 'main';
+    if (pInput) pInput.value = config.postsPath || 'src/content/posts';
+
+    authModal?.classList.remove('hidden');
+  }
+
+  function closeModal() {
+    authModal?.classList.add('hidden');
+  }
+
+  openAuthBtn?.addEventListener('click', openModal);
+  closeAuthBtn?.addEventListener('click', closeModal);
+
+  // Form submit & test GitHub connection
+  authForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const token = document.getElementById('cfg-token').value.trim();
+    const owner = document.getElementById('cfg-owner').value.trim();
+    const repo = document.getElementById('cfg-repo').value.trim();
+    const branch = document.getElementById('cfg-branch').value.trim() || 'main';
+    const postsPath = document.getElementById('cfg-path').value.trim() || 'src/content/posts';
+
+    const statusMsg = document.getElementById('auth-status-msg');
+    const saveBtn = document.getElementById('test-save-btn');
+
+    if (!token || !owner || !repo) {
+      if (statusMsg) {
+        statusMsg.textContent = 'Please provide token, owner, and repo.';
+        statusMsg.className = 'p-2.5 rounded bg-red-100 text-red-800 block';
+      }
+      return;
+    }
+
+    if (saveBtn) saveBtn.textContent = 'Testing connection...';
+
+    try {
+      const url = `https://api.github.com/repos/${owner}/${repo}/contents/${postsPath.replace(/^\/+|\/+$/g, '')}?ref=${branch}`;
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/vnd.github.v3+json',
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`GitHub replied ${res.status}: ${res.statusText}`);
+      }
+
+      // Success: save configuration
+      const config = { token, owner, repo, branch, postsPath };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+
+      if (statusMsg) {
+        statusMsg.textContent = 'Connection verified! Repository linked successfully.';
+        statusMsg.className = 'p-2.5 rounded bg-emerald-100 text-emerald-800 block';
+      }
+
+      updateConnectionBadge();
+      setTimeout(closeModal, 1000);
+      syncWithGitHub();
+    } catch (err) {
+      if (statusMsg) {
+        statusMsg.textContent = `Error: ${err.message}. Check token permissions & repository name.`;
+        statusMsg.className = 'p-2.5 rounded bg-red-100 text-red-800 block';
+      }
+    } finally {
+      if (saveBtn) saveBtn.textContent = 'Save & Test Connection';
+    }
+  });
+
+  disconnectBtn?.addEventListener('click', () => {
+    localStorage.removeItem(STORAGE_KEY);
+    updateConnectionBadge();
+    closeModal();
+    posts = [...initialPosts];
+    renderTable();
+  });
+
+  // Sync with GitHub API if connected
+  async function syncWithGitHub() {
+    const config = getStoredConfig();
+    if (!config || !config.token || !config.owner || !config.repo) {
+      renderTable();
+      return;
+    }
+
+    const refreshBtn = document.getElementById('refresh-posts-btn');
+    if (refreshBtn) refreshBtn.classList.add('animate-pulse');
+
+    try {
+      const cleanPath = config.postsPath.replace(/^\/+|\/+$/g, '');
+      const url = `https://api.github.com/repos/${config.owner}/${config.repo}/contents/${cleanPath}?ref=${config.branch}`;
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${config.token}`,
+          Accept: 'application/vnd.github.v3+json',
+        },
+      });
+
+      if (res.ok) {
+        const files = await res.json();
+        const mdFiles = Array.isArray(files) ? files.filter(f => f.name.endsWith('.md')) : [];
+        
+        // Merge with our posts list
+        const updated = await Promise.all(
+          mdFiles.map(async (file) => {
+            try {
+              const fileRes = await fetch(file.url, {
+                headers: {
+                  Authorization: `Bearer ${config.token}`,
+                  Accept: 'application/vnd.github.v3+json',
+                },
+              });
+              if (fileRes.ok) {
+                const data = await fileRes.json();
+                const binary = atob(data.content.replace(/\s/g, ''));
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) {
+                  bytes[i] = binary.charCodeAt(i);
+                }
+                const content = new TextDecoder().decode(bytes);
+                
+                const titleMatch = content.match(/title:\s*["']?([^"'\n]+)["']?/);
+                const draftMatch = content.match(/draft:\s*(true|false)/i);
+                const dateMatch = content.match(/pubDate:\s*([^\n]+)/);
+                const specimenMatch = content.match(/name:\s*["']?([^"'\n]+)["']?/);
+
+                return {
+                  name: file.name,
+                  slug: file.name.replace(/\.md$/, ''),
+                  title: titleMatch ? titleMatch[1] : file.name,
+                  date: dateMatch ? dateMatch[1].trim() : '',
+                  isDraft: draftMatch ? draftMatch[1].toLowerCase() === 'true' : false,
+                  author: 'Dr. E. Archer',
+                  tags: [],
+                  specimen: specimenMatch ? specimenMatch[1] : '',
+                };
+              }
+            } catch (e) {
+              console.warn(e);
+            }
+            return {
+              name: file.name,
+              slug: file.name.replace(/\.md$/, ''),
+              title: file.name,
+              date: '',
+              isDraft: false,
+              author: 'Dr. E. Archer',
+              tags: [],
+              specimen: '',
+            };
+          })
+        );
+
+        if (updated.length > 0) {
+          posts = updated;
+        }
+      }
+    } catch (err) {
+      console.warn('Could not sync with GitHub:', err);
+    } finally {
+      if (refreshBtn) refreshBtn.classList.remove('animate-pulse');
+      renderTable();
+    }
+  }
+
+  document.getElementById('refresh-posts-btn')?.addEventListener('click', syncWithGitHub);
+
+  // Initialize
+  updateConnectionBadge();
+  syncWithGitHub();
+</script>

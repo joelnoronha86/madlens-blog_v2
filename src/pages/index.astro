@@ -1,0 +1,359 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import ColorAtlas from '../components/ColorAtlas.astro';
+import { getCollection } from 'astro:content';
+
+// Fetch published posts sorted by pubDate descending
+const allPosts = await getCollection('posts', ({ data }) => {
+  return data.draft !== true;
+});
+
+const sortedPosts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const featuredPost = sortedPosts[0];
+const recentPosts = sortedPosts.slice(1, 4);
+---
+
+<BaseLayout
+  title="Geographies of Textiles and Natural Dyes | Where Chemistry Meets Living Color"
+  description="A poetic scientific journal combining historical dye chemistry, botanical field ecology, and textile craftsmanship. Edited by Dr. E. Archer."
+>
+  <!-- Hero Section inspired by bz13x3bz13x3bz13.jpeg and ikuyy2ikuyy2ikuy.jpeg -->
+  <section class="relative bg-parchment-base border-b border-parchment-border overflow-hidden">
+    <!-- Subtle top ledger rule -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-16 lg:py-20">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        
+        <!-- Left Column: Title & Poetic Vision -->
+        <div class="lg:col-span-7 space-y-6">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-parchment-deep border border-parchment-border font-mono text-xs uppercase tracking-widest text-sage-botanical">
+            <span>VOL. I &bull; FIELD JOURNAL & ESSAYS</span>
+          </div>
+
+          <h1 class="font-heading text-4xl sm:text-5xl md:text-6xl text-indigo-deep font-semibold tracking-tight leading-[1.1]">
+            Geographies of <br class="hidden sm:inline" />
+            <span class="italic font-normal">Natural Dyes</span> & Textiles
+          </h1>
+
+          <p class="font-heading italic text-xl sm:text-2xl text-sage-botanical max-w-xl">
+            Where the rigorous chemistry of botanical pigments meets the timeless art of living color.
+          </p>
+
+          <p class="font-body text-base sm:text-lg text-indigo-deep/90 max-w-xl leading-relaxed">
+            Written by a PhD researcher and textile artist, this digital archive traces the cartography of human culture through plants, fermentation vats, and mineral mordants—mapping how ancient societies colored their world from the Indus Valley to the Mediterranean.
+          </p>
+
+          <div class="pt-4 flex flex-wrap items-center gap-4">
+            <a
+              href="#latest-research"
+              class="px-6 py-3 rounded bg-indigo-deep text-parchment-light font-mono text-xs uppercase tracking-widest font-bold hover:bg-madder-red transition-all shadow-sm"
+            >
+              Explore Field Logs
+            </a>
+            <a
+              href="/materials"
+              class="px-6 py-3 rounded border border-indigo-deep/40 bg-parchment-light text-indigo-deep font-mono text-xs uppercase tracking-widest hover:border-madder-red hover:text-madder-red transition-all"
+            >
+              Material Map
+            </a>
+          </div>
+
+          <!-- Technical metadata bar -->
+          <div class="pt-6 border-t border-parchment-border/80 flex flex-wrap gap-y-2 gap-x-6 font-mono text-xs text-sage-botanical">
+            <div><strong class="text-indigo-deep">CARTOGRAPHY:</strong> INDUS &bull; ANATOLIA &bull; PROVENCE</div>
+            <div><strong class="text-indigo-deep">ARCHIVE:</strong> 4 PUBLISHED DISPATCHES</div>
+          </div>
+        </div>
+
+        <!-- Right Column: Visual Hero Flatlay with Swatches -->
+        <div class="lg:col-span-5 relative">
+          <div class="relative p-2 bg-parchment-light border border-parchment-border shadow-lg rounded-sm transform lg:rotate-1 hover:rotate-0 transition-transform duration-500">
+            <img
+              src="/images/hero-field-notebook-flatlay.jpeg"
+              alt="Natural dyes flat-lay with antique field notebook, indigo textile swatches, and ceramic pigment bowls"
+              class="w-full h-auto object-cover rounded-sm"
+            />
+            
+            <div class="p-3 bg-parchment-base border-t border-parchment-border/60 flex items-center justify-between font-mono text-[11px] text-sage-botanical uppercase">
+              <span>FIG. 0 // THE BOTANICAL DESK</span>
+              <span class="text-madder-red">NATURAL COLOR ARCHIVE</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Editorial Section: The Researcher & Artist (Gemini_Generated_Image_1qmh3j1qmh3j1qmh.jpeg) -->
+  <section class="py-16 bg-parchment-light border-b border-parchment-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Top header line -->
+      <div class="flex items-center justify-between border-b border-parchment-border pb-3 mb-8 font-mono text-xs text-sage-botanical">
+        <span class="uppercase tracking-widest font-bold">
+          ABOUT THE FOUNDER // PhD RESEARCHER & ARTIST
+        </span>
+        <span class="hidden sm:inline">
+          FIELDWORK LOGS &deg; 25&deg;12' N, 68&deg;51' E
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        
+        <!-- Left: Image & Studio Description -->
+        <div class="lg:col-span-7 space-y-6">
+          <h2 class="font-heading text-3xl sm:text-4xl md:text-5xl text-indigo-deep">
+            The Researcher & Artist
+          </h2>
+          <p class="font-heading italic text-lg sm:text-xl text-sage-botanical">
+            Blending the molecular chemistry of natural pigments with the art of traditional textiles.
+          </p>
+
+          <div class="relative border border-parchment-border p-2 bg-parchment-base rounded-sm shadow-sm">
+            <img
+              src="/images/studio-researcher.jpeg"
+              alt="Dr. E. Archer in her natural dye studio examining indigo dyed textiles"
+              class="w-full h-auto object-cover rounded-sm"
+            />
+            <div class="mt-2 font-mono text-xs text-sage-botanical uppercase tracking-wider text-center">
+              FIG. 1: DR. E. ARCHER IN HER NATURAL DYE STUDIO
+            </div>
+          </div>
+
+          <!-- Two-column editorial copy with drop cap -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm sm:text-base leading-relaxed text-indigo-deep/90">
+            <p class="drop-cap">
+              I am a PhD researcher and textile artist dedicated to tracing the histories, science, and geographies of natural pigments. My work bridges the gap between historical chemistry and traditional craft, exploring how ancient societies used native plants to color their world.
+            </p>
+            <p>
+              Through field research and studio practice, I investigate the intricate fermentation of indigo, the earthy reds of madder, and the vibrant yellows of weld. This blog serves as a digital archive of these journeys, mapping the intersection of geography, science, and lived textile history.
+            </p>
+          </div>
+        </div>
+
+        <!-- Right: Field Philosophy & Swatches Sidebar -->
+        <div class="lg:col-span-5 space-y-6">
+          <div class="border border-parchment-border bg-parchment-base/80 p-6 rounded-sm space-y-5">
+            <div class="border-b border-parchment-border pb-3">
+              <span class="font-mono text-xs uppercase tracking-widest text-sage-botanical font-bold block">
+                FIELD METHODOLOGY & PHILOSOPHY
+              </span>
+            </div>
+
+            <dl class="space-y-3 font-mono text-xs text-indigo-deep">
+              <div>
+                <dt class="text-[11px] text-sage-botanical uppercase">FOCUS:</dt>
+                <dd class="font-bold">NATURAL COLOR CARTOGRAPHY</dd>
+              </div>
+              <div>
+                <dt class="text-[11px] text-sage-botanical uppercase">FIELDWORK LOG:</dt>
+                <dd>INDUS VALLEY, ANATOLIA & MEDITERRANEAN</dd>
+              </div>
+              <div>
+                <dt class="text-[11px] text-sage-botanical uppercase">METHODS:</dt>
+                <dd>OXIDATION & FERMENTATION ANALYSIS</dd>
+              </div>
+              <div>
+                <dt class="text-[11px] text-sage-botanical uppercase">COORDINATES:</dt>
+                <dd class="text-madder-red font-semibold">25°12' N, 68°51' E</dd>
+              </div>
+            </dl>
+
+            <div class="pt-4 border-t border-parchment-border">
+              <div class="font-mono text-xs uppercase tracking-wider text-sage-botanical font-bold mb-3">
+                PRIMARY FIELD SWATCHES
+              </div>
+              <div class="space-y-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 swatch-pinked bg-madder-red shadow-sm shrink-0"></div>
+                  <div>
+                    <div class="font-mono text-xs font-bold text-indigo-deep uppercase">MADDER RED</div>
+                    <div class="font-heading italic text-xs text-sage-botanical">SWATCH M-01 &bull; Rubia tinctorum</div>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 swatch-pinked bg-weld-ochre shadow-sm shrink-0"></div>
+                  <div>
+                    <div class="font-mono text-xs font-bold text-indigo-deep uppercase">WELD OCHRE</div>
+                    <div class="font-heading italic text-xs text-sage-botanical">SWATCH W-02 &bull; Reseda luteola</div>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 swatch-pinked bg-sage-botanical shadow-sm shrink-0"></div>
+                  <div>
+                    <div class="font-mono text-xs font-bold text-indigo-deep uppercase">BOTANICAL SAGE</div>
+                    <div class="font-heading italic text-xs text-sage-botanical">SWATCH S-03 &bull; Salvia & Iron</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-2 text-center">
+              <a
+                href="/about"
+                class="inline-block w-full py-2 text-center font-mono text-xs uppercase tracking-widest text-indigo-deep border border-indigo-deep/30 hover:bg-indigo-deep hover:text-parchment-light transition-all rounded"
+              >
+                Read Biography & Studio Tour &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Article (Issue 04: Indigo) -->
+  {featuredPost && (
+    <section class="py-16 bg-parchment-base border-b border-parchment-border">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="flex items-center justify-between mb-8">
+          <div class="font-mono text-xs uppercase tracking-widest text-sage-botanical font-bold flex items-center gap-2">
+            <span>✦</span>
+            <span>FEATURED RESEARCH MONOGRAPH</span>
+            <span>✦</span>
+          </div>
+          <span class="font-mono text-xs text-madder-red font-bold uppercase">
+            {featuredPost.data.issue}
+          </span>
+        </div>
+
+        <div class="bg-parchment-light border border-parchment-border rounded-sm overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+          <div class="grid grid-cols-1 lg:grid-cols-12">
+            
+            <div class="lg:col-span-6 relative aspect-[16/10] lg:aspect-auto">
+              <img
+                src={featuredPost.data.coverImage || '/images/indigo-vat-fermentation.jpeg'}
+                alt={featuredPost.data.title}
+                class="w-full h-full object-cover"
+              />
+              <div class="absolute bottom-3 left-3 px-3 py-1 bg-parchment-base/90 backdrop-blur-sm border border-parchment-border font-mono text-[11px] text-sage-botanical uppercase">
+                {featuredPost.data.specimen?.origin || 'INDUS VALLEY ARCHIVE'}
+              </div>
+            </div>
+
+            <div class="lg:col-span-6 p-8 sm:p-10 flex flex-col justify-between">
+              <div>
+                <div class="font-mono text-xs text-sage-botanical uppercase tracking-wider mb-2">
+                  LOG: {featuredPost.data.specimen?.name} &bull; {featuredPost.data.specimen?.coordinates}
+                </div>
+                <h3 class="font-heading text-3xl sm:text-4xl text-indigo-deep leading-tight hover:text-madder-red transition-colors">
+                  <a href={`/posts/${featuredPost.id.replace(/\.md$/, '')}`}>
+                    {featuredPost.data.title}
+                  </a>
+                </h3>
+                {featuredPost.data.subtitle && (
+                  <p class="font-heading italic text-xl text-sage-botanical mt-2">
+                    {featuredPost.data.subtitle}
+                  </p>
+                )}
+                <p class="font-body text-base text-indigo-deep/85 mt-4 leading-relaxed">
+                  {featuredPost.data.excerpt}
+                </p>
+              </div>
+
+              <div class="mt-8 pt-6 border-t border-parchment-border/70 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  {featuredPost.data.swatches?.map((s) => (
+                    <span
+                      class="w-4 h-4 rounded-full border border-black/10 inline-block"
+                      style={`background-color: ${s.color};`}
+                      title={s.name}
+                    ></span>
+                  ))}
+                  <span class="font-mono text-xs text-sage-botanical ml-1">
+                    {featuredPost.data.author}
+                  </span>
+                </div>
+
+                <a
+                  href={`/posts/${featuredPost.id.replace(/\.md$/, '')}`}
+                  class="px-5 py-2 rounded bg-madder-red text-parchment-light font-mono text-xs uppercase tracking-wider font-bold hover:bg-madder-dark transition-colors"
+                >
+                  Read Full Monograph &rarr;
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+  )}
+
+  <!-- Latest Research Grid -->
+  <section id="latest-research" class="py-16 bg-parchment-light">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="flex flex-col sm:flex-row items-baseline justify-between mb-12 border-b border-parchment-border pb-4">
+        <div>
+          <div class="font-mono text-xs uppercase tracking-widest text-sage-botanical mb-1 font-bold">
+            ✦ FIELD ARCHIVES ✦
+          </div>
+          <h2 class="font-heading text-3xl sm:text-4xl md:text-5xl text-indigo-deep">
+            Latest Research Dispatches
+          </h2>
+        </div>
+        <a
+          href="/archives"
+          class="font-mono text-xs uppercase tracking-wider text-madder-red hover:text-madder-dark font-bold mt-2 sm:mt-0 flex items-center gap-1"
+        >
+          <span>View All Field Logs ({allPosts.length})</span>
+          <span>&rarr;</span>
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {recentPosts.map((post) => (
+          <PostCard post={post} />
+        ))}
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Interactive Color Atlas -->
+  <ColorAtlas />
+
+  <!-- Field Dispatches Newsletter Signup -->
+  <section class="py-16 bg-parchment-base border-t border-parchment-border">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-5">
+      <div class="font-mono text-xs uppercase tracking-widest text-sage-botanical font-bold">
+        DISPATCHES FROM THE DYE VAT
+      </div>
+      <h2 class="font-heading text-3xl sm:text-4xl text-indigo-deep">
+        Receive Field Notes & Dye Recipes
+      </h2>
+      <p class="font-body text-base text-indigo-deep/80 max-w-lg mx-auto">
+        Occasional postal dispatches covering new fermentation experiments, chemical formulas, and botanical specimen findings. No spam, ever.
+      </p>
+
+      <form id="dispatch-form" class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 max-w-md mx-auto">
+        <input
+          type="email"
+          required
+          placeholder="your.email@fieldnotes.org"
+          class="w-full px-4 py-2.5 rounded border border-parchment-border bg-parchment-light font-mono text-xs text-indigo-deep focus:outline-none focus:border-indigo-deep"
+        />
+        <button
+          type="submit"
+          class="w-full sm:w-auto px-6 py-2.5 rounded bg-indigo-deep text-parchment-light font-mono text-xs uppercase tracking-widest font-bold hover:bg-madder-red transition-colors whitespace-nowrap"
+        >
+          Subscribe
+        </button>
+      </form>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.getElementById('dispatch-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    alert('Thank you for subscribing to Geographies of Natural Dyes field dispatches.');
+  });
+</script>

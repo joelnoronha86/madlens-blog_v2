@@ -1,0 +1,176 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-parchment-base: #F4EFE6;
+  --color-parchment-light: #FAF7F2;
+  --color-parchment-deep: #ECE5D8;
+  --color-indigo-deep: #2C4251;
+  --color-madder-red: #943D36;
+  --color-weld-ochre: #C98E3A;
+  --color-sage-botanical: #5B7065;
+}
+
+body {
+  background-color: #F4EFE6;
+  color: #2C4251;
+  font-family: 'Lora', Georgia, serif;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(201, 142, 58, 0.03) 0%, transparent 20%),
+    radial-gradient(circle at 90% 80%, rgba(91, 112, 101, 0.03) 0%, transparent 25%),
+    radial-gradient(circle at 50% 50%, rgba(148, 61, 54, 0.02) 0%, transparent 40%);
+}
+
+::selection {
+  background-color: #2C4251;
+  color: #FAF7F2;
+}
+
+/* Headings font */
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  color: #2C4251;
+  letter-spacing: 0.015em;
+}
+
+/* Monospace font */
+.font-mono, code, pre, kbd, samp {
+  font-family: 'Courier Prime', 'Courier New', monospace;
+}
+
+/* Field Notebook Ledger Borders */
+.ledger-border {
+  border: 1px solid #DCD3C1;
+  box-shadow: 0 1px 3px rgba(44, 66, 81, 0.04);
+}
+
+.double-ledger-border {
+  border: 1px solid #DCD3C1;
+  outline: 1px solid #DCD3C1;
+  outline-offset: 3px;
+}
+
+/* Drop Cap Styling */
+.drop-cap::first-letter {
+  float: left;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 4.25rem;
+  line-height: 0.8;
+  font-weight: 700;
+  padding-right: 0.65rem;
+  padding-top: 0.2rem;
+  color: #2C4251;
+}
+
+/* Textile Swatch simulation with pinked/frayed edges */
+.swatch-fabric {
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08), 0 3px 6px rgba(0,0,0,0.08);
+}
+
+.swatch-pinked {
+  position: relative;
+  /* subtle jagged serrated edge effect */
+  background-size: cover;
+  clip-path: polygon(
+    0% 2px, 2% 0px, 4% 2px, 6% 0px, 8% 2px, 10% 0px, 12% 2px, 14% 0px, 16% 2px, 18% 0px, 20% 2px, 22% 0px, 24% 2px, 26% 0px, 28% 2px, 30% 0px, 32% 2px, 34% 0px, 36% 2px, 38% 0px, 40% 2px, 42% 0px, 44% 2px, 46% 0px, 48% 2px, 50% 0px, 52% 2px, 54% 0px, 56% 2px, 58% 0px, 60% 2px, 62% 0px, 64% 2px, 66% 0px, 68% 2px, 70% 0px, 72% 2px, 74% 0px, 76% 2px, 78% 0px, 80% 2px, 82% 0px, 84% 2px, 86% 0px, 88% 2px, 90% 0px, 92% 2px, 94% 0px, 96% 2px, 98% 0px, 100% 2px,
+    100% calc(100% - 2px), 98% 100%, 96% calc(100% - 2px), 94% 100%, 92% calc(100% - 2px), 90% 100%, 88% calc(100% - 2px), 86% 100%, 84% calc(100% - 2px), 82% 100%, 80% calc(100% - 2px), 78% 100%, 76% calc(100% - 2px), 74% 100%, 72% calc(100% - 2px), 70% 100%, 68% calc(100% - 2px), 66% 100%, 64% calc(100% - 2px), 62% 100%, 60% calc(100% - 2px), 58% 100%, 56% calc(100% - 2px), 54% 100%, 52% calc(100% - 2px), 50% 100%, 48% calc(100% - 2px), 46% 100%, 44% calc(100% - 2px), 42% 100%, 40% calc(100% - 2px), 38% 100%, 36% calc(100% - 2px), 34% 100%, 32% calc(100% - 2px), 30% 100%, 28% calc(100% - 2px), 26% 100%, 24% calc(100% - 2px), 22% 100%, 20% calc(100% - 2px), 18% 100%, 16% calc(100% - 2px), 14% 100%, 12% calc(100% - 2px), 10% 100%, 8% calc(100% - 2px), 6% 100%, 4% calc(100% - 2px), 2% 100%, 0% calc(100% - 2px)
+  );
+}
+
+/* Tiptap Editor Styling */
+.ProseMirror {
+  outline: none;
+  min-height: 380px;
+  font-family: 'Lora', Georgia, serif;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #2C4251;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: #9AA6AC;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.ProseMirror h1, .ProseMirror h2, .ProseMirror h3 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  color: #2C4251;
+  font-weight: 600;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.ProseMirror h1 { font-size: 2.25rem; }
+.ProseMirror h2 { font-size: 1.75rem; }
+.ProseMirror h3 { font-size: 1.35rem; }
+
+.ProseMirror blockquote {
+  border-left: 3px solid #C98E3A;
+  background-color: #ECE5D8;
+  padding: 0.75rem 1rem;
+  font-style: italic;
+  margin: 1.25rem 0;
+}
+
+.ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 1.5rem auto;
+  border: 1px solid #DCD3C1;
+}
+
+.ProseMirror pre {
+  background: #2C4251;
+  color: #FAF7F2;
+  font-family: 'Courier Prime', monospace;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.ProseMirror code {
+  font-family: 'Courier Prime', monospace;
+  background-color: #ECE5D8;
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #F4EFE6;
+}
+::-webkit-scrollbar-thumb {
+  background: #DCD3C1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #5B7065;
+}

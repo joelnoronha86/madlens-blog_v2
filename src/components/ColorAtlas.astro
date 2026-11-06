@@ -1,0 +1,232 @@
+---
+const dyes = [
+  {
+    id: 'indigo',
+    name: 'Indigofera Blue',
+    latin: 'Indigofera tinctoria',
+    family: 'Fabaceae (Legume)',
+    colorHex: '#2C4251',
+    category: 'Vat Dye / Reduced Leuco',
+    chromophore: 'Indigotin (C16H10N2O2)',
+    geography: 'Indus Valley, Tokushima, Sindh',
+    coordinates: "25°12' N, 68°51' E",
+    mordant: 'None (Vat Oxidation)',
+    description: 'Requires anaerobic bacterial reduction in an alkaline vat to convert insoluble blue to water-soluble yellow leuco-indigo, which oxidizes into deep lapis upon contact with air.',
+    slug: 'the-chemistry-and-art-of-indigo-dyeing',
+  },
+  {
+    id: 'madder',
+    name: 'Madder Root Red',
+    latin: 'Rubia tinctorum',
+    family: 'Rubiaceae (Coffee family)',
+    colorHex: '#943D36',
+    category: 'Adjective Anthraquinone',
+    chromophore: 'Alizarin (C14H8O4)',
+    geography: 'Anatolian Plateau, Levant, Provence',
+    coordinates: "38°29' N, 35°44' E",
+    mordant: 'Potassium Alum + Calcium',
+    description: 'Harvested from three-year-old subterranean rhizomes. Chelates with trivalent aluminum and calcium ions to create the legendary, lightfast Turkey Red (Adrianople Red).',
+    slug: 'madder-red-the-root-of-trade',
+  },
+  {
+    id: 'weld',
+    name: 'Weld Golden Ochre',
+    latin: 'Reseda luteola',
+    family: 'Resedaceae',
+    colorHex: '#C98E3A',
+    category: 'Flavone Dye',
+    chromophore: 'Luteolin (C15H10O6)',
+    geography: 'Provence, Southern Alps, Mediterranean',
+    coordinates: "43°45' N, 4°49' E",
+    mordant: 'Alum + Tartar',
+    description: 'Produces the purest and most UV-stable yellow in the plant kingdom. Traditionally over-dyed with woad or indigo to yield historical Lincoln Green.',
+    slug: 'the-bright-yellows-of-weld',
+  },
+  {
+    id: 'sage',
+    name: 'Botanical Sage & Iron',
+    latin: 'Salvia officinalis',
+    family: 'Lamiaceae (Mint family)',
+    colorHex: '#5B7065',
+    category: 'Polyphenol & Tannin Complex',
+    chromophore: 'Iron Gallotannate',
+    geography: 'Aegean Archipelago, Greek Isles',
+    coordinates: "36°50' N, 27°18' E",
+    mordant: 'Ferrous Acetate / Iron Liquor',
+    description: 'Rich in polyphenols and rosmarinic acid. Post-treating the bath with ferrous liquor saddens the golden yellows into contemplative, weathered slate and olive sages.',
+    slug: 'botanical-sage-and-iron-water',
+  },
+  {
+    id: 'cochineal',
+    name: 'Cochineal Carmine',
+    latin: 'Dactylopius coccus',
+    family: 'Dactylopiidae (Scale Insect)',
+    colorHex: '#BA2D3C',
+    category: 'Entomological C-Glycoside',
+    chromophore: 'Carminic Acid (C22H20O13)',
+    geography: 'Oaxaca Central Valleys, Andes',
+    coordinates: "17°04' N, 96°43' W",
+    mordant: 'Alum (Crimson) or Tin (Scarlet)',
+    description: 'Reared on the pads of nopal cactus. Yields an astonishing spectrum from bright fiery scarlet to imperial violet depending on dye bath pH and metallic salts.',
+    slug: 'cochineal-highlands-of-oaxaca',
+  },
+];
+---
+
+<section class="py-16 bg-parchment-deep/30 border-y border-parchment-border">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Section Header -->
+    <div class="text-center max-w-2xl mx-auto mb-12">
+      <div class="font-mono text-xs uppercase tracking-widest text-sage-botanical mb-2">
+        ✦ COLOR CARTOGRAPHY & PIGMENT TAXONOMY ✦
+      </div>
+      <h2 class="font-heading text-3xl sm:text-4xl md:text-5xl text-indigo-deep">
+        The Living Color Atlas
+      </h2>
+      <p class="font-body text-indigo-deep/80 mt-3 text-base sm:text-lg italic">
+        Select a pigment to inspect its botanical classification, chromophore chemistry, and historic trade coordinates.
+      </p>
+    </div>
+
+    <!-- Interactive Swatch Selector -->
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4 mb-8">
+      {dyes.map((dye, index) => (
+        <button
+          type="button"
+          class={`atlas-tab text-left p-3.5 sm:p-4 rounded border transition-all duration-200 cursor-pointer ${
+            index === 0
+              ? 'border-indigo-deep bg-parchment-light shadow-md ring-1 ring-indigo-deep/30'
+              : 'border-parchment-border bg-parchment-light/60 hover:bg-parchment-light hover:border-indigo-deep/40'
+          }`}
+          data-dye-id={dye.id}
+        >
+          <div class="flex items-center gap-2 mb-2">
+            <span
+              class="w-5 h-5 rounded-sm swatch-pinked shadow-sm inline-block"
+              style={`background-color: ${dye.colorHex};`}
+            ></span>
+            <span class="font-mono text-xs font-bold text-indigo-deep uppercase tracking-wider truncate">
+              {dye.name.split(' ')[0]}
+            </span>
+          </div>
+          <div class="font-heading italic text-xs text-sage-botanical truncate">
+            {dye.latin}
+          </div>
+        </button>
+      ))}
+    </div>
+
+    <!-- Active Dye Details Panel -->
+    {dyes.map((dye, index) => (
+      <div
+        id={`atlas-panel-${dye.id}`}
+        class={`atlas-panel bg-parchment-light border border-parchment-border p-6 sm:p-8 rounded-sm shadow-sm ${
+          index === 0 ? 'block' : 'hidden'
+        }`}
+      >
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          <!-- Swatch & Visual -->
+          <div class="lg:col-span-4 flex flex-col items-center justify-center p-6 bg-parchment-base rounded border border-parchment-border/70 text-center">
+            <div
+              class="w-32 h-32 sm:w-40 sm:h-40 swatch-pinked shadow-lg mb-4 relative"
+              style={`background-color: ${dye.colorHex};`}
+            >
+              <div class="w-full h-full opacity-25 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:5px_5px]"></div>
+            </div>
+            <div class="font-mono text-xs font-bold text-indigo-deep uppercase tracking-widest">
+              SWATCH CODE: {dye.id.toUpperCase()}-01
+            </div>
+            <div class="font-mono text-[11px] text-sage-botanical mt-0.5">
+              HEX: {dye.colorHex.toUpperCase()} &bull; 100% UNBLEACHED LINEN
+            </div>
+          </div>
+
+          <!-- Scientific & Cartographic Data -->
+          <div class="lg:col-span-8 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-parchment-border pb-3">
+              <div>
+                <h3 class="font-heading text-3xl sm:text-4xl text-indigo-deep">
+                  {dye.name}
+                </h3>
+                <p class="font-heading italic text-lg text-sage-botanical">
+                  {dye.latin} &bull; {dye.family}
+                </p>
+              </div>
+              <span class="font-mono text-xs px-2.5 py-1 rounded bg-parchment-deep text-indigo-deep border border-parchment-border">
+                {dye.category}
+              </span>
+            </div>
+
+            <p class="font-body text-base text-indigo-deep/90 leading-relaxed">
+              {dye.description}
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 font-mono text-xs">
+              <div class="p-3 bg-parchment-base rounded border border-parchment-border/60">
+                <span class="text-sage-botanical uppercase block text-[10px]">CHROMOPHORE</span>
+                <span class="font-bold text-indigo-deep text-xs sm:text-sm">{dye.chromophore}</span>
+              </div>
+              <div class="p-3 bg-parchment-base rounded border border-parchment-border/60">
+                <span class="text-sage-botanical uppercase block text-[10px]">ORIGIN & REGION</span>
+                <span class="font-bold text-indigo-deep text-xs sm:text-sm">{dye.geography}</span>
+              </div>
+              <div class="p-3 bg-parchment-base rounded border border-parchment-border/60">
+                <span class="text-sage-botanical uppercase block text-[10px]">COORDINATES</span>
+                <span class="font-bold text-madder-red text-xs sm:text-sm">{dye.coordinates}</span>
+              </div>
+            </div>
+
+            <div class="pt-2 flex items-center justify-between">
+              <span class="font-mono text-xs text-sage-botanical">
+                MORDANT / ALCHEMY: <strong class="text-indigo-deep">{dye.mordant}</strong>
+              </span>
+              <a
+                href={`/posts/${dye.slug}`}
+                class="inline-flex items-center gap-1 font-mono text-xs uppercase tracking-wider text-madder-red hover:text-madder-dark font-bold"
+              >
+                <span>Read Full Research Log</span>
+                <span>&rarr;</span>
+              </a>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    ))}
+
+  </div>
+</section>
+
+<script>
+  const tabs = document.querySelectorAll('.atlas-tab');
+  const panels = document.querySelectorAll('.atlas-panel');
+
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const dyeId = tab.getAttribute('data-dye-id');
+
+      // Update tabs
+      tabs.forEach((t) => {
+        t.classList.remove('border-indigo-deep', 'bg-parchment-light', 'shadow-md', 'ring-1', 'ring-indigo-deep/30');
+        t.classList.add('border-parchment-border', 'bg-parchment-light/60');
+      });
+      tab.classList.add('border-indigo-deep', 'bg-parchment-light', 'shadow-md', 'ring-1', 'ring-indigo-deep/30');
+      tab.classList.remove('border-parchment-border', 'bg-parchment-light/60');
+
+      // Update panels
+      panels.forEach((p) => {
+        p.classList.add('hidden');
+        p.classList.remove('block');
+      });
+
+      const activePanel = document.getElementById(`atlas-panel-${dyeId}`);
+      if (activePanel) {
+        activePanel.classList.remove('hidden');
+        activePanel.classList.add('block');
+      }
+    });
+  });
+</script>
