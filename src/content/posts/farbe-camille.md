@@ -5,7 +5,7 @@ excerpt: "biography in a cemetary"
 author: "Dr. E. Archer"
 pubDate: 2026-11-07
 issue: "ARTICLE ISSUE 05 // THE CHEMISTRY OF COLOR"
-draft: true
+draft: false
 tags:
   - "Natural Dye"
 ---
