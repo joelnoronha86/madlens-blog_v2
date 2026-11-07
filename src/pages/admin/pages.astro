@@ -1,0 +1,369 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const allPages = await getCollection('pages');
+
+const pagesList = [
+  {
+    title: 'Home Page (Frontispiece)',
+    slug: 'home',
+    url: '/',
+    type: 'Core System Page',
+    description: 'Hero monograph, founder intro, latest research dispatches, and living color atlas.',
+    draft: false,
+    blocksCount: allPages.find((p) => p.data.slug === 'home')?.data.blocks?.length || 6,
+  },
+  {
+    title: 'About the Founder: Dr. E. Archer',
+    slug: 'about',
+    url: '/about',
+    type: 'Core System Page',
+    description: 'PhD researcher biography, studio philosophy, laboratory apparatus, and field foraging ethics.',
+    draft: false,
+    blocksCount: allPages.find((p) => p.data.slug === 'about')?.data.blocks?.length || 4,
+  },
+  {
+    title: 'Field Archives & Repository',
+    slug: 'archives',
+    url: '/archives',
+    type: 'Core System Page',
+    description: 'Chronological repository of all published monographs with real-time tag filters and search.',
+    draft: false,
+    blocksCount: allPages.find((p) => p.data.slug === 'archives')?.data.blocks?.length || 2,
+  },
+  {
+    title: 'The Material Map & Color Cartography',
+    slug: 'materials',
+    url: '/materials',
+    type: 'Core System Page',
+    description: 'Regional dye cartographies, botanical taxonomy, and chemical coordination chromophores.',
+    draft: false,
+    blocksCount: allPages.find((p) => p.data.slug === 'materials')?.data.blocks?.length || 3,
+  },
+  ...allPages
+    .filter((p) => !['home', 'about', 'archives', 'materials'].includes(p.data.slug))
+    .map((p) => ({
+      title: p.data.title,
+      slug: p.data.slug,
+      url: `/pages/${p.data.slug}`,
+      type: 'Custom Landing Page',
+      description: p.data.description || 'Custom modular landing page built with Easyblocks.',
+      draft: Boolean(p.data.draft),
+      blocksCount: p.data.blocks?.length || 0,
+    })),
+];
+---
+
+<BaseLayout
+  title="All Pages Overview | Easyblocks Studio"
+  description="Overview and visual editing of all blog pages, home, about, archives, materials, and landing pages."
+>
+  <div class="py-10 bg-parchment-base min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Studio Header -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-parchment-border pb-6 mb-8">
+        <div>
+          <div class="flex items-center gap-2 font-mono text-xs text-sage-botanical uppercase tracking-wider mb-1">
+            <span>WRITER STUDIO</span>
+            <span>&bull;</span>
+            <span class="px-2 py-0.5 rounded text-[10px] bg-indigo-soft text-indigo-deep border border-indigo-deep/20 font-bold">
+              EASYBLOCKS PAGE MANAGER
+            </span>
+          </div>
+          <h1 class="font-heading text-3xl sm:text-4xl text-indigo-deep font-semibold">
+            All Website Pages
+          </h1>
+          <p class="font-body text-xs sm:text-sm text-indigo-deep/80 mt-1">
+            Visual drag-and-drop editing for your Home page, About page, Archives, Materials, and Custom Landing Pages.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <a
+            href="/admin"
+            class="px-4 py-2 rounded border border-indigo-deep/30 bg-parchment-light hover:bg-parchment-deep text-indigo-deep font-mono text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-sm"
+          >
+            &larr; Tiptap Articles
+          </a>
+
+          <button
+            id="open-create-page-modal"
+            type="button"
+            class="px-4 py-2 rounded border border-indigo-deep bg-parchment-light hover:bg-parchment-deep text-indigo-deep font-mono text-xs uppercase tracking-wider font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Create New Page</span>
+          </button>
+
+          <a
+            href="/admin/easyblocks?page=home"
+            class="px-5 py-2 rounded bg-indigo-deep hover:bg-madder-red text-parchment-light font-mono text-xs uppercase tracking-widest font-bold transition-all shadow-sm flex items-center gap-2"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <span>Open Easyblocks Editor</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Studio Mode Navigation Tabs -->
+      <div class="flex items-center gap-3 mb-8 border-b border-parchment-border pb-3 font-mono text-xs uppercase tracking-wider">
+        <a
+          href="/admin/pages"
+          class="px-4 py-2 rounded bg-indigo-deep text-parchment-light font-bold shadow-sm flex items-center gap-2"
+        >
+          <span>All Pages (Easyblocks Studio)</span>
+          <span class="px-1.5 py-0.5 rounded text-[10px] bg-white/20 text-white font-bold">{pagesList.length}</span>
+        </a>
+        <a
+          href="/admin"
+          class="px-4 py-2 rounded text-indigo-deep hover:bg-parchment-light border border-transparent transition-colors"
+        >
+          Research Articles (Tiptap Long-Form)
+        </a>
+      </div>
+
+      <!-- Cloudflare Continuous Deployment & CI Skip Banner -->
+      <div class="mb-8 p-4 bg-parchment-light border border-parchment-border rounded-sm flex items-start sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></div>
+          <div class="font-mono text-xs text-indigo-deep">
+            <strong>SMART CI SKIP ACTIVE:</strong> Quick saves and drafts automatically append <code class="bg-parchment-deep px-1.5 py-0.5 rounded text-madder-red font-bold">[skip ci]</code> to Git commits. Cloudflare Pages skips rebuilding until you click <strong>Publish</strong>.
+          </div>
+        </div>
+        <span class="hidden md:inline-block font-mono text-[11px] text-sage-botanical uppercase">
+          Zero wasted build minutes
+        </span>
+      </div>
+
+      <!-- All Pages Table -->
+      <div class="bg-parchment-light border border-parchment-border rounded-sm shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-parchment-border bg-parchment-deep/50 font-mono text-[11px] text-sage-botanical uppercase tracking-wider">
+                <th class="py-3 px-4 sm:px-6">Status</th>
+                <th class="py-3 px-4 sm:px-6">Page Name & Purpose</th>
+                <th class="py-3 px-4 sm:px-6 hidden md:table-cell">Route</th>
+                <th class="py-3 px-4 sm:px-6 hidden sm:table-cell">Type</th>
+                <th class="py-3 px-4 sm:px-6 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-parchment-border/60 font-mono text-xs">
+              {pagesList.map((page) => (
+                <tr class="hover:bg-parchment-base/70 transition-colors">
+                  <td class="py-4 px-4 sm:px-6 whitespace-nowrap">
+                    {page.draft ? (
+                      <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-madder-soft text-madder-red border border-madder-light/40">
+                        DRAFT
+                      </span>
+                    ) : (
+                      <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">
+                        PUBLISHED
+                      </span>
+                    )}
+                  </td>
+                  <td class="py-4 px-4 sm:px-6">
+                    <div class="font-heading text-lg sm:text-xl font-bold text-indigo-deep hover:text-madder-red">
+                      <a href={`/admin/easyblocks?page=${page.slug}`}>{page.title}</a>
+                    </div>
+                    <div class="font-body text-xs text-indigo-deep/70 line-clamp-1 mt-0.5">
+                      {page.description}
+                    </div>
+                  </td>
+                  <td class="py-4 px-4 sm:px-6 hidden md:table-cell text-sage-botanical text-xs font-mono">
+                    <a href={page.url} target="_blank" class="hover:text-madder-red hover:underline">
+                      {page.url} &nearr;
+                    </a>
+                  </td>
+                  <td class="py-4 px-4 sm:px-6 hidden sm:table-cell text-sage-botanical text-xs">
+                    <span class="px-2 py-0.5 rounded bg-parchment-deep text-indigo-deep text-[11px]">
+                      {page.type}
+                    </span>
+                  </td>
+                  <td class="py-4 px-4 sm:px-6 text-right whitespace-nowrap">
+                    <div class="flex items-center justify-end gap-2">
+                      <a
+                        href={page.url}
+                        target="_blank"
+                        class="px-2.5 py-1 rounded border border-indigo-deep/30 bg-parchment-base hover:bg-indigo-deep hover:text-parchment-light text-indigo-deep text-[11px] uppercase tracking-wider"
+                      >
+                        View
+                      </a>
+                      <a
+                        href={`/admin/easyblocks?page=${page.slug}`}
+                        class="px-3 py-1 rounded bg-indigo-deep hover:bg-madder-red text-parchment-light text-[11px] uppercase tracking-wider font-bold shadow-sm"
+                      >
+                        Edit in Easyblocks &rarr;
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Create Page Modal -->
+    <div id="create-page-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white rounded-lg shadow-2xl max-w-md w-full p-6 space-y-4 border border-parchment-border">
+        <div class="flex items-center justify-between border-b border-gray-200 pb-3">
+          <h3 class="font-heading text-xl font-bold text-indigo-deep">Create New Page</h3>
+          <button id="close-create-page-modal" type="button" class="text-gray-400 hover:text-black text-lg cursor-pointer">&times;</button>
+        </div>
+
+        <form id="new-page-form" class="space-y-4 font-mono text-xs">
+          <div>
+            <label class="block text-gray-700 font-bold mb-1 uppercase tracking-wider">Page Title</label>
+            <input
+              id="new-page-title"
+              type="text"
+              placeholder="e.g., Aegean Dye Workshop 2027"
+              required
+              class="w-full p-2.5 border border-gray-300 rounded font-sans text-sm focus:border-indigo-deep focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label class="block text-gray-700 font-bold mb-1 uppercase tracking-wider">URL Slug</label>
+            <div class="flex items-center border border-gray-300 rounded px-2.5 bg-gray-50">
+              <span class="text-gray-500 font-mono text-xs">/pages/</span>
+              <input
+                id="new-page-slug"
+                type="text"
+                placeholder="workshop-2027"
+                required
+                class="w-full p-2 bg-transparent font-mono text-xs focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 font-bold mb-1 uppercase tracking-wider">Description</label>
+            <textarea
+              id="new-page-desc"
+              rows="2"
+              placeholder="Short description for metadata & social previews"
+              class="w-full p-2 border border-gray-300 rounded font-sans text-xs focus:border-indigo-deep focus:outline-none"
+            ></textarea>
+          </div>
+
+          <div class="pt-3 border-t border-gray-200 flex items-center justify-end gap-3">
+            <button
+              type="button"
+              id="cancel-create-page-modal"
+              class="px-4 py-2 rounded border border-gray-300 text-gray-700 font-mono text-xs uppercase cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="px-5 py-2 rounded bg-indigo-deep hover:bg-madder-red text-white font-mono text-xs uppercase font-bold shadow-sm transition-colors cursor-pointer"
+            >
+              Create & Open in Easyblocks &rarr;
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const openModalBtn = document.getElementById('open-create-page-modal');
+      const modal = document.getElementById('create-page-modal');
+      const closeModalBtn = document.getElementById('close-create-page-modal');
+      const cancelModalBtn = document.getElementById('cancel-create-page-modal');
+      const form = document.getElementById('new-page-form') as HTMLFormElement | null;
+      const titleInput = document.getElementById('new-page-title') as HTMLInputElement | null;
+      const slugInput = document.getElementById('new-page-slug') as HTMLInputElement | null;
+      const descInput = document.getElementById('new-page-desc') as HTMLTextAreaElement | null;
+
+      openModalBtn?.addEventListener('click', () => {
+        modal?.classList.remove('hidden');
+        titleInput?.focus();
+      });
+
+      const hideModal = () => modal?.classList.add('hidden');
+      closeModalBtn?.addEventListener('click', hideModal);
+      cancelModalBtn?.addEventListener('click', hideModal);
+
+      // Auto-generate slug from title
+      titleInput?.addEventListener('input', () => {
+        if (slugInput && !slugInput.dataset.manual) {
+          slugInput.value = titleInput.value
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)/g, '');
+        }
+      });
+
+      slugInput?.addEventListener('input', () => {
+        if (slugInput) slugInput.dataset.manual = 'true';
+      });
+
+      form?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const title = titleInput?.value.trim() || 'New Custom Page';
+        const slug = slugInput?.value.trim() || `page-${Date.now()}`;
+        const description = descInput?.value.trim() || '';
+
+        // Default starter block template matching Easyblocks banner
+        const starterData = {
+          title,
+          slug,
+          description,
+          draft: true,
+          updatedAt: new Date().toISOString(),
+          blocks: [
+            {
+              id: `blk-${Date.now()}-hero`,
+              type: 'HeroSectionBlock',
+              props: {
+                title,
+                subtitle: description || 'Crafted with the Geographies of Textiles and Natural Dyes visual page builder.',
+                tagline: 'SPECIAL FIELD EDITION',
+                image: '/images/hero-field-notebook-flatlay.jpeg',
+                ctaText: 'Show now',
+                ctaLink: '#content',
+                secondaryCtaText: 'Learn more',
+                secondaryCtaLink: '/about',
+                coverPosition: 'right',
+                coverWidth: '50%',
+                marginTop: 0,
+                marginBottom: 64,
+                paddingInternal: 24,
+                fillEnable: true,
+                fillColor: '#F4EFE6',
+              },
+            },
+            {
+              id: `blk-${Date.now()}-editorial`,
+              type: 'EditorialTwoColBlock',
+              props: {
+                heading: 'Field Observations & Historical Context',
+                col1: 'Natural dyes represent one of humanity\'s earliest and most sophisticated organic biotechnologies...',
+                col2: 'Through careful investigation of mordant chemistry and botanical extraction...',
+                marginTop: 0,
+                marginBottom: 48,
+              },
+            },
+          ],
+        };
+
+        // Cache into localStorage so Easyblocks loads it immediately
+        localStorage.setItem(`easyblocks_landing_${slug}`, JSON.stringify(starterData));
+
+        // Navigate to Easyblocks
+        window.location.href = `/admin/easyblocks?page=${slug}`;
+      });
+    </script>
+  </div>
+</BaseLayout>

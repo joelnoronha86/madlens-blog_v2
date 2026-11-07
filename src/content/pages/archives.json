@@ -1,0 +1,38 @@
+{
+  "title": "Field Archives & Research Dispatches",
+  "slug": "archives",
+  "description": "Chronological logbook of field essays, chemical analyses, and textile dyeing research.",
+  "draft": false,
+  "updatedAt": "2026-11-07T02:00:00Z",
+  "blocks": [
+    {
+      "id": "blk-arch-hero",
+      "type": "HeroSectionBlock",
+      "props": {
+        "title": "Field Archives",
+        "subtitle": "Explore all published monographs, laboratory fermentation notes, and botanical cartographies documenting natural dye traditions across the globe.",
+        "tagline": "COMPLETE FIELD LOGS & REPOSITORY",
+        "image": "/images/research-specimens-triptych.jpeg",
+        "ctaText": "Browse Recent Dispatches",
+        "ctaLink": "#archives-grid",
+        "accentColor": "#943D36",
+        "coverPosition": "right",
+        "coverWidth": "45%"
+      }
+    },
+    {
+      "id": "blk-arch-swatches",
+      "type": "SwatchAtlasBlock",
+      "props": {
+        "heading": "Pigment Categories in Archive",
+        "description": "Filter by primary botanical family or chemical chromophore class.",
+        "swatches": [
+          { "name": "Indigo Blues", "binomial": "Vat Indigotin", "color": "#2C4251", "texture": "linen" },
+          { "name": "Madder Terracottas", "binomial": "Alizarin Lake", "color": "#943D36", "texture": "wool" },
+          { "name": "Weld Ochres", "binomial": "Flavone Luteolin", "color": "#C98E3A", "texture": "silk" },
+          { "name": "Botanical Sages", "binomial": "Iron Gallotannate", "color": "#5B7065", "texture": "linen" }
+        ]
+      }
+    }
+  ]
+}

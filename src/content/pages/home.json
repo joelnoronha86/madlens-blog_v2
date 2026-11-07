@@ -1,0 +1,89 @@
+{
+  "title": "Home | Geographies of Natural Dyes & Textiles",
+  "slug": "home",
+  "description": "Where the rigorous chemistry of botanical pigments meets the timeless art of living color.",
+  "draft": false,
+  "updatedAt": "2026-11-07T02:00:00Z",
+  "blocks": [
+    {
+      "id": "blk-home-hero",
+      "type": "HeroSectionBlock",
+      "props": {
+        "title": "Geographies of Natural Dyes & Textiles",
+        "subtitle": "Where the rigorous chemistry of botanical pigments meets the timeless art of living color.",
+        "tagline": "VOL. I • SPECIAL FIELD EDITION",
+        "image": "/images/hero-field-notebook-flatlay.jpeg",
+        "ctaText": "Explore Field Logs",
+        "ctaLink": "#latest-research",
+        "accentColor": "#2C4251",
+        "coverPosition": "right",
+        "coverWidth": "50%",
+        "marginTop": 0,
+        "marginBottom": 64,
+        "paddingInternal": 24
+      }
+    },
+    {
+      "id": "blk-home-editorial",
+      "type": "EditorialTwoColBlock",
+      "props": {
+        "heading": "The Researcher & Artist",
+        "subheading": "Blending the molecular chemistry of natural pigments with the art of traditional textiles.",
+        "col1": "I am a PhD researcher and textile artist dedicated to tracing the histories, science, and geographies of natural pigments. My work bridges the gap between historical chemistry and traditional craft, exploring how ancient societies used native plants to color their world.",
+        "col2": "Through field research and studio practice, I investigate the intricate fermentation of indigo, the earthy reds of madder, and the vibrant yellows of weld. This blog serves as a digital archive of these journeys, mapping the intersection of geography, science, and lived textile history.",
+        "image": "/images/studio-researcher.jpeg",
+        "caption": "FIG. 1: DR. E. ARCHER IN HER NATURAL DYE STUDIO",
+        "marginTop": 0,
+        "marginBottom": 48
+      }
+    },
+    {
+      "id": "blk-home-symposium",
+      "type": "HeroSectionBlock",
+      "props": {
+        "title": "International Natural Dyes Symposium 2026",
+        "subtitle": "Archaeological chemistry, field foraging, and traditional Aegean dye vats on the island of Kos.",
+        "tagline": "SPECIAL GATHERING • OCTOBER 14-19, 2026",
+        "image": "/images/indigo-vat-fermentation.jpeg",
+        "ctaText": "View Symposium Page",
+        "ctaLink": "/pages/symposium-2026",
+        "accentColor": "#943D36",
+        "coverPosition": "left",
+        "coverWidth": "45%"
+      }
+    },
+    {
+      "id": "blk-home-swatches",
+      "type": "SwatchAtlasBlock",
+      "props": {
+        "heading": "The Living Color Atlas",
+        "description": "Select a pigment to inspect its botanical classification, chromophore chemistry, and historic trade coordinates.",
+        "swatches": [
+          { "name": "Indigo Deep", "binomial": "Indigofera tinctoria", "color": "#2C4251", "texture": "linen" },
+          { "name": "Madder Red", "binomial": "Rubia tinctorum", "color": "#943D36", "texture": "linen" },
+          { "name": "Weld Ochre", "binomial": "Reseda luteola", "color": "#C98E3A", "texture": "powder" },
+          { "name": "Botanical Sage", "binomial": "Salvia officinalis", "color": "#5B7065", "texture": "linen" },
+          { "name": "Cochineal Carmine", "binomial": "Dactylopius coccus", "color": "#BA2D3C", "texture": "silk" }
+        ]
+      }
+    },
+    {
+      "id": "blk-home-quote",
+      "type": "QuoteCalloutBlock",
+      "props": {
+        "quote": "When an indigo vat breathes, it is not metaphor—it is billions of anaerobic bacteria reducing insoluble indigotin into liquid gold. The dyer's hand is simply an instrument of that living ecology.",
+        "author": "Dr. E. Archer",
+        "affiliation": "PhD, Archaeological Chemistry & Textile Conservation"
+      }
+    },
+    {
+      "id": "blk-home-newsletter",
+      "type": "NewsletterDispatchBlock",
+      "props": {
+        "heading": "Receive Field Notes & Dye Recipes",
+        "subheading": "Occasional postal dispatches covering new fermentation experiments, chemical formulas, and botanical specimen findings. No spam, ever.",
+        "buttonText": "Subscribe to Dispatches"
+      }
+    }
+  ]
+}

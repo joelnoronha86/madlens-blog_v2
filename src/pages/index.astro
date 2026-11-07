@@ -2,7 +2,19 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostCard from '../components/PostCard.astro';
 import ColorAtlas from '../components/ColorAtlas.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
+
+// Fetch home page configuration from Easyblocks pages collection
+const homeDoc = await getEntry('pages', 'home');
+const homeHero = homeDoc?.data?.blocks?.find((b: any) => b.type === 'HeroSectionBlock');
+const heroProps = homeHero?.props || {};
+
+const heroTitle = heroProps.title || "Geographies of Natural Dyes & Textiles";
+const heroSubtitle = heroProps.subtitle || "Where the rigorous chemistry of botanical pigments meets the timeless art of living color.";
+const heroTagline = heroProps.tagline || "VOL. I • FIELD JOURNAL & ESSAYS";
+const heroImage = heroProps.image || "/images/hero-field-notebook-flatlay.jpeg";
+const heroCtaText = heroProps.ctaText || "Explore Field Logs";
+const heroCtaLink = heroProps.ctaLink || "#latest-research";
 
 // Fetch published posts sorted by pubDate descending
 const allPosts = await getCollection('posts', ({ data }) => {
@@ -26,17 +38,16 @@ const recentPosts = sortedPosts.slice(1, 4);
         
         <!-- Left Column: Title & Poetic Vision -->
         <div class="lg:col-span-7 space-y-6">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-parchment-deep border border-parchment-border font-mono text-xs uppercase tracking-widest text-sage-botanical">
-            <span>VOL. I &bull; FIELD JOURNAL & ESSAYS</span>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-parchment-deep border border-parchment-border font-mono text-xs uppercase tracking-widest text-sage-botanical font-bold">
+            <span>{heroTagline}</span>
           </div>
 
           <h1 class="font-heading text-4xl sm:text-5xl md:text-6xl text-indigo-deep font-semibold tracking-tight leading-[1.1]">
-            Geographies of <br class="hidden sm:inline" />
-            <span class="italic font-normal">Natural Dyes</span> & Textiles
+            {heroTitle}
           </h1>
 
           <p class="font-heading italic text-xl sm:text-2xl text-sage-botanical max-w-xl">
-            Where the rigorous chemistry of botanical pigments meets the timeless art of living color.
+            {heroSubtitle}
           </p>
 
           <p class="font-body text-base sm:text-lg text-indigo-deep/90 max-w-xl leading-relaxed">
@@ -45,10 +56,10 @@ const recentPosts = sortedPosts.slice(1, 4);
 
           <div class="pt-4 flex flex-wrap items-center gap-4">
             <a
-              href="#latest-research"
+              href={heroCtaLink}
               class="px-6 py-3 rounded bg-indigo-deep text-parchment-light font-mono text-xs uppercase tracking-widest font-bold hover:bg-madder-red transition-all shadow-sm"
             >
-              Explore Field Logs
+              {heroCtaText}
             </a>
             <a
               href="/materials"
@@ -61,7 +72,7 @@ const recentPosts = sortedPosts.slice(1, 4);
           <!-- Technical metadata bar -->
           <div class="pt-6 border-t border-parchment-border/80 flex flex-wrap gap-y-2 gap-x-6 font-mono text-xs text-sage-botanical">
             <div><strong class="text-indigo-deep">CARTOGRAPHY:</strong> INDUS &bull; ANATOLIA &bull; PROVENCE</div>
-            <div><strong class="text-indigo-deep">ARCHIVE:</strong> 4 PUBLISHED DISPATCHES</div>
+            <div><strong class="text-indigo-deep">ARCHIVE:</strong> {allPosts.length} PUBLISHED DISPATCHES</div>
           </div>
         </div>
 
@@ -69,8 +80,8 @@ const recentPosts = sortedPosts.slice(1, 4);
         <div class="lg:col-span-5 relative">
           <div class="relative p-2 bg-parchment-light border border-parchment-border shadow-lg rounded-sm transform lg:rotate-1 hover:rotate-0 transition-transform duration-500">
             <img
-              src="/images/hero-field-notebook-flatlay.jpeg"
-              alt="Natural dyes flat-lay with antique field notebook, indigo textile swatches, and ceramic pigment bowls"
+              src={heroImage}
+              alt={heroTitle}
               class="w-full h-auto object-cover rounded-sm"
             />
             

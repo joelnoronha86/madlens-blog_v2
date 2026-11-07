@@ -1,0 +1,51 @@
+{
+  "title": "Material Map & Color Cartography",
+  "slug": "materials",
+  "description": "Explore the global cartography, historical trade routes, and biochemical signatures of natural dye plants.",
+  "draft": false,
+  "updatedAt": "2026-11-07T02:00:00Z",
+  "blocks": [
+    {
+      "id": "blk-mat-hero",
+      "type": "HeroSectionBlock",
+      "props": {
+        "title": "The Material Map",
+        "subtitle": "Every natural pigment carries the mineral composition of its soil, the altitude of its climate, and the ingenuity of human hands.",
+        "tagline": "NATURAL COLOR CARTOGRAPHY",
+        "image": "/images/hero-field-notebook-flatlay.jpeg",
+        "ctaText": "Explore Pigment Atlas",
+        "ctaLink": "#atlas",
+        "accentColor": "#2C4251",
+        "coverPosition": "right",
+        "coverWidth": "50%"
+      }
+    },
+    {
+      "id": "blk-mat-swatches",
+      "type": "SwatchAtlasBlock",
+      "props": {
+        "heading": "The Living Color Atlas",
+        "description": "Botanical classification, chromophore chemistry, and historic trade coordinates.",
+        "swatches": [
+          { "name": "Indigofera Blue", "binomial": "Indigofera tinctoria", "color": "#2C4251", "texture": "linen" },
+          { "name": "Madder Root Red", "binomial": "Rubia tinctorum", "color": "#943D36", "texture": "linen" },
+          { "name": "Weld Golden Ochre", "binomial": "Reseda luteola", "color": "#C98E3A", "texture": "powder" },
+          { "name": "Botanical Sage & Iron", "binomial": "Salvia officinalis", "color": "#5B7065", "texture": "linen" },
+          { "name": "Cochineal Carmine", "binomial": "Dactylopius coccus", "color": "#BA2D3C", "texture": "silk" }
+        ]
+      }
+    },
+    {
+      "id": "blk-mat-specimen",
+      "type": "SpecimenShowcaseBlock",
+      "props": {
+        "name": "Indigofera tinctoria & Rubia tinctorum",
+        "commonName": "True Indigo & Common Madder",
+        "coordinates": "25°12' N, 68°51' E &bull; 38°29' N, 35°44' E",
+        "origin": "Indus Valley Archive & Anatolian Plateau",
+        "chemical": "Indigotin (C16H10N2O2) & Alizarin (C14H8O4)",
+        "notes": "Two foundational pillars of antique textile cartography across the Maritime Silk Road."
+      }
+    }
+  ]
+}

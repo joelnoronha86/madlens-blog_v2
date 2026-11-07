@@ -6,25 +6,72 @@ interface Props {
   image?: string;
   ctaText?: string;
   ctaLink?: string;
+  secondaryCtaText?: string;
+  secondaryCtaLink?: string;
   accentColor?: string;
+  coverPosition?: 'right' | 'left' | 'background' | 'none';
+  coverWidth?: string;
+  marginTop?: number;
+  marginBottom?: number;
+  paddingTop?: number;
+  paddingBottom?: number;
+  paddingInternal?: number;
+  fillEnable?: boolean;
+  fillColor?: string;
+  maxWidth?: string;
+  coverVerticalAlign?: 'top' | 'center' | 'bottom' | 'stretch';
+  stackPosition?: string;
 }
 
 const {
-  title = 'Geographies of Natural Dyes',
-  subtitle = 'Where Chemistry Meets Living Color',
+  title = 'Get comfy with Living Color',
+  subtitle = 'Where the chemistry of natural pigments meets the timeless art of living color.',
   tagline = 'VOL. I • SPECIAL FIELD EDITION',
   image = '/images/hero-field-notebook-flatlay.jpeg',
-  ctaText = 'Explore Field Logs',
+  ctaText = 'Show now',
   ctaLink = '#content',
+  secondaryCtaText = 'Learn more',
+  secondaryCtaLink = '/about',
   accentColor = '#2C4251',
+  coverPosition = 'right',
+  coverWidth = '50%',
+  coverVerticalAlign = 'stretch',
+  marginTop = 0,
+  marginBottom = 64,
+  paddingTop = 48,
+  paddingBottom = 48,
+  paddingInternal = 24,
+  fillEnable = true,
+  fillColor = '#F4EFE6',
+  maxWidth = 'none',
+  stackPosition = 'center',
 } = Astro.props;
+
+const isReverse = coverPosition === 'left';
+const hasImage = Boolean(image) && coverPosition !== 'none';
+
+const isCentered = stackPosition.includes('center');
+const isRight = stackPosition.includes('right');
+const textAlignClass = isRight ? 'text-right' : isCentered ? 'text-center' : 'text-left';
+const itemsAlignClass = isRight ? 'items-end' : isCentered ? 'items-center' : 'items-start';
+const justifyClass = isRight ? 'justify-end' : isCentered ? 'justify-center' : 'justify-start';
 ---
 
-<section class="relative bg-parchment-base border-b border-parchment-border py-16 lg:py-24 overflow-hidden">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+<section
+  class="relative border-b border-parchment-border transition-all"
+  style={`
+    margin-top: ${marginTop}px;
+    margin-bottom: ${marginBottom}px;
+    padding-top: ${paddingTop}px;
+    padding-bottom: ${paddingBottom}px;
+    background-color: ${fillEnable ? fillColor : 'transparent'};
+  `}
+>
+  <div class={`mx-auto px-4 sm:px-6 lg:px-8 ${maxWidth === 'none' ? 'max-w-7xl' : ''}`} style={maxWidth !== 'none' ? `max-w: ${maxWidth}` : ''}>
+    <div class={`grid grid-cols-1 lg:grid-cols-12 gap-8 ${coverVerticalAlign === 'stretch' ? 'items-stretch' : 'items-center'} ${isReverse ? 'lg:flex-row-reverse' : ''}`} style={`gap: ${paddingInternal}px;`}>
       
-      <div class="lg:col-span-7 space-y-5">
+      <!-- Text Content Column -->
+      <div class={`${hasImage ? (coverWidth === '50%' ? 'lg:col-span-6' : coverWidth === '40%' ? 'lg:col-span-7' : 'lg:col-span-5') : 'lg:col-span-12'} flex flex-col ${itemsAlignClass} ${textAlignClass} space-y-5 ${isReverse ? 'lg:order-2' : 'lg:order-1'}`}>
         {tagline && (
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-parchment-deep border border-parchment-border font-mono text-xs uppercase tracking-widest text-sage-botanical font-bold">
             <span>✦ {tagline} ✦</span>
@@ -36,31 +83,43 @@ const {
         </h1>
 
         {subtitle && (
-          <p class="font-heading italic text-xl sm:text-2xl text-sage-botanical max-w-xl">
+          <p class={`font-body text-base sm:text-lg text-indigo-deep/85 leading-relaxed max-w-xl ${isCentered ? 'mx-auto' : ''}`}>
             {subtitle}
           </p>
         )}
 
-        {ctaText && (
-          <div class="pt-4">
-            <a
-              href={ctaLink}
-              class="inline-block px-6 py-3 rounded text-parchment-light font-mono text-xs uppercase tracking-widest font-bold shadow-sm transition-all hover:opacity-90"
-              style={`background-color: ${accentColor};`}
-            >
-              {ctaText} &rarr;
-            </a>
+        <!-- Buttons (like "Show now" and "Learn more" in Easyblocks screenshot) -->
+        {(ctaText || secondaryCtaText) && (
+          <div class={`pt-2 flex flex-wrap items-center gap-3 ${justifyClass}`}>
+            {ctaText && (
+              <a
+                href={ctaLink}
+                class="px-5 py-2.5 rounded bg-indigo-deep text-parchment-light font-mono text-xs uppercase tracking-wider font-bold shadow-sm transition-all hover:bg-madder-red"
+                style={accentColor ? `background-color: ${accentColor};` : ''}
+              >
+                {ctaText}
+              </a>
+            )}
+            {secondaryCtaText && (
+              <a
+                href={secondaryCtaLink}
+                class="px-5 py-2.5 rounded border border-indigo-deep/30 bg-parchment-light/80 hover:bg-parchment-deep text-indigo-deep font-mono text-xs uppercase tracking-wider font-bold transition-all shadow-sm"
+              >
+                {secondaryCtaText}
+              </a>
+            )}
           </div>
         )}
       </div>
 
-      {image && (
-        <div class="lg:col-span-5">
-          <div class="relative p-2 bg-parchment-light border border-parchment-border shadow-lg rounded-sm transform lg:rotate-1 hover:rotate-0 transition-transform duration-300">
+      <!-- Cover Image Column (Matches the image in Easyblocks screenshot) -->
+      {hasImage && (
+        <div class={`${coverWidth === '50%' ? 'lg:col-span-6' : coverWidth === '40%' ? 'lg:col-span-5' : 'lg:col-span-7'} ${isReverse ? 'lg:order-1' : 'lg:order-2'} flex items-center`}>
+          <div class="relative w-full h-full min-h-[300px] overflow-hidden rounded-sm border border-parchment-border shadow-md bg-parchment-deep aspect-[4/3] sm:aspect-[16/11]">
             <img
               src={image}
               alt={title}
-              class="w-full h-auto object-cover rounded-sm"
+              class="w-full h-full object-cover object-center"
               loading="lazy"
             />
           </div>

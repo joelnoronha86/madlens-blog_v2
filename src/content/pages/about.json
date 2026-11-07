@@ -1,0 +1,57 @@
+{
+  "title": "About the Founder: Dr. E. Archer",
+  "slug": "about",
+  "description": "Biography, studio philosophy, and research methodology of Dr. E. Archer, PhD archaeological chemist and natural dyer.",
+  "draft": false,
+  "updatedAt": "2026-11-07T02:00:00Z",
+  "blocks": [
+    {
+      "id": "blk-about-hero",
+      "type": "HeroSectionBlock",
+      "props": {
+        "title": "Dr. E. Archer",
+        "subtitle": "Archaeological Chemist, Natural Dyer & Cartographer of Color",
+        "tagline": "ABOUT THE FOUNDER // PhD RESEARCHER & ARTIST",
+        "image": "/images/studio-researcher.jpeg",
+        "ctaText": "Explore Research Archives",
+        "ctaLink": "/archives",
+        "accentColor": "#2C4251",
+        "coverPosition": "right",
+        "coverWidth": "50%"
+      }
+    },
+    {
+      "id": "blk-about-editorial",
+      "type": "EditorialTwoColBlock",
+      "props": {
+        "heading": "The Living Philosophy of the Studio",
+        "subheading": "Dismantling the artificial divide between scientific rigor and aesthetic wonder.",
+        "col1": "I began my scholarly life in sterile university chemistry laboratories, surrounded by fume hoods, NMR spectrometers, and high-performance liquid chromatography columns. Yet my heart was always pulled toward the smell of crushed madder roots, the bubbling warmth of fermentation vats, and the tactile weave of handspun linen.",
+        "col2": "Natural dyes are not merely historical relics or primitive substitutes for synthetic colorants; they are complex living systems governed by thermodynamics, coordination chemistry, and biodiversity. When we investigate them with scientific rigor, we honor millennia of empirical wisdom.",
+        "image": "/images/indigo-leaf-field-ledger.jpeg",
+        "caption": "FIG. 2: Botanical ledger specimen and field notes"
+      }
+    },
+    {
+      "id": "blk-about-quote",
+      "type": "QuoteCalloutBlock",
+      "props": {
+        "quote": "When an indigo vat breathes, billions of anaerobic bacteria reduce insoluble indigotin into liquid gold. The dyer's hand is simply an instrument of that living ecology.",
+        "author": "Dr. E. Archer",
+        "affiliation": "Natural Dye Herbarium & Fiber Laboratory"
+      }
+    },
+    {
+      "id": "blk-about-gallery",
+      "type": "GalleryTriptychBlock",
+      "props": {
+        "heading": "Field Stations & Studio Apparatus",
+        "items": [
+          { "title": "Indigo Fermentation Cisterns", "image": "/images/indigo-vat-fermentation.jpeg", "tag": "SINDH DELTA", "caption": "Anaerobic reduction vats" },
+          { "title": "Field Herbarium Desk", "image": "/images/hero-field-notebook-flatlay.jpeg", "tag": "STUDIO ARCHIVE", "caption": "Pressed plants & powders" },
+          { "title": "Rhizome & Flavone Triptych", "image": "/images/research-specimens-triptych.jpeg", "tag": "ANATOLIAN SOILS", "caption": "Madder roots and weld flowers" }
+        ]
+      }
+    }
+  ]
+}

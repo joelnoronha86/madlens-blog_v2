@@ -1,9 +1,18 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getEntry } from 'astro:content';
+
+const aboutDoc = await getEntry('pages', 'about');
+const aboutHero = aboutDoc?.data?.blocks?.find((b: any) => b.type === 'HeroSectionBlock');
+const heroProps = aboutHero?.props || {};
+
+const founderName = heroProps.title || "Dr. E. Archer";
+const founderSubtitle = heroProps.subtitle || "Archaeological Chemist, Natural Dyer & Cartographer of Color";
+const founderImage = heroProps.image || "/images/studio-researcher.jpeg";
 ---
 
 <BaseLayout
-  title="About the Founder: Dr. E. Archer | Geographies of Natural Dyes"
+  title={`About the Founder: ${founderName} | Geographies of Natural Dyes`}
   description="Biography, studio philosophy, and research methodology of Dr. E. Archer, PhD archaeological chemist and natural dyer."
 >
   <div class="py-12 bg-parchment-base">
@@ -22,21 +31,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           
           <div>
             <h1 class="font-heading text-4xl sm:text-5xl md:text-6xl text-indigo-deep font-semibold">
-              Dr. E. Archer
+              {founderName}
             </h1>
             <p class="font-heading italic text-xl sm:text-2xl text-sage-botanical mt-2">
-              Archaeological Chemist, Natural Dyer & Cartographer of Color
+              {founderSubtitle}
             </p>
           </div>
 
           <div class="border border-parchment-border p-2 bg-parchment-light rounded-sm shadow-sm">
             <img
-              src="/images/studio-researcher.jpeg"
-              alt="Dr. E. Archer inspecting indigo dyed linen in her sunlit dye workshop"
+              src={founderImage}
+              alt={`${founderName} in natural dye studio`}
               class="w-full h-auto object-cover rounded-sm"
             />
             <div class="mt-2.5 font-mono text-xs text-sage-botanical uppercase tracking-wider text-center">
-              FIG. 1: DR. E. ARCHER IN HER NATURAL DYE STUDIO
+              FIG. 1: {founderName.toUpperCase()} IN HER NATURAL DYE STUDIO
             </div>
           </div>
 

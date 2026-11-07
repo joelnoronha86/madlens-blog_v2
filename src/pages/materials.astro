@@ -1,6 +1,15 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ColorAtlas from '../components/ColorAtlas.astro';
+import { getEntry } from 'astro:content';
+
+const matDoc = await getEntry('pages', 'materials');
+const matHero = matDoc?.data?.blocks?.find((b: any) => b.type === 'HeroSectionBlock');
+const heroProps = matHero?.props || {};
+
+const pageTitle = heroProps.title || "The Material Map";
+const pageSubtitle = heroProps.subtitle || "Colors do not exist in a vacuum. Every natural pigment carries the mineral composition of its soil, the altitude of its climate, and the ingenuity of the human hands that learned to coax color from leaf, root, and insect.";
+const pageTagline = heroProps.tagline || "NATURAL COLOR CARTOGRAPHY";
 
 const regions = [
   {
@@ -56,13 +65,13 @@ const regions = [
       <!-- Page Header -->
       <div class="max-w-3xl mb-12">
         <div class="font-mono text-xs uppercase tracking-widest text-sage-botanical font-bold mb-2">
-          NATURAL COLOR CARTOGRAPHY
+          {pageTagline}
         </div>
         <h1 class="font-heading text-4xl sm:text-5xl md:text-6xl text-indigo-deep">
-          The Material Map
+          {pageTitle}
         </h1>
         <p class="font-body text-base sm:text-lg text-indigo-deep/80 mt-3 leading-relaxed">
-          Colors do not exist in a vacuum. Every natural pigment carries the mineral composition of its soil, the altitude of its climate, and the ingenuity of the human hands that learned to coax color from leaf, root, and insect.
+          {pageSubtitle}
         </p>
       </div>
 

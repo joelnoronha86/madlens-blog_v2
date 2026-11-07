@@ -1,7 +1,15 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
+
+const archDoc = await getEntry('pages', 'archives');
+const archHero = archDoc?.data?.blocks?.find((b: any) => b.type === 'HeroSectionBlock');
+const heroProps = archHero?.props || {};
+
+const pageTitle = heroProps.title || "Field Archives";
+const pageSubtitle = heroProps.subtitle || "Explore all published monographs, laboratory fermentation notes, and botanical cartographies documenting natural dye traditions across the globe.";
+const pageTagline = heroProps.tagline || "COMPLETE FIELD LOGS & REPOSITORY";
 
 const posts = await getCollection('posts', ({ data }) => {
   return data.draft !== true;
@@ -23,13 +31,13 @@ const allTags = Array.from(new Set(sortedPosts.flatMap((post) => post.data.tags)
       <!-- Page Header -->
       <div class="max-w-3xl mb-10">
         <div class="font-mono text-xs uppercase tracking-widest text-sage-botanical font-bold mb-2">
-          COMPLETE FIELD LOGS & REPOSITORY
+          {pageTagline}
         </div>
         <h1 class="font-heading text-4xl sm:text-5xl md:text-6xl text-indigo-deep">
-          Field Archives
+          {pageTitle}
         </h1>
         <p class="font-body text-base sm:text-lg text-indigo-deep/80 mt-3 leading-relaxed">
-          Explore all published monographs, laboratory fermentation notes, and botanical cartographies documenting natural dye traditions across the globe.
+          {pageSubtitle}
         </p>
       </div>
 

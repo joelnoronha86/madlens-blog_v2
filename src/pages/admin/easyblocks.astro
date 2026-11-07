@@ -1,0 +1,1297 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const allPages = await getCollection('pages');
+const pagesPayloadJson = JSON.stringify(
+  allPages.map((p) => ({
+    slug: p.data.slug || p.id.replace(/\.json$/, ''),
+    title: p.data.title,
+    description: p.data.description || '',
+    draft: Boolean(p.data.draft),
+    blocks: p.data.blocks || [],
+    updatedAt: p.data.updatedAt || '',
+  }))
+);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Easyblocks Visual Editor | Geographies of Natural Dyes</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%232C4251'/></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Courier+Prime:ital,wght@0,400;0,700&family=Lora:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background-color: #ECEEF1;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        user-select: none;
+      }
+      /* Custom iOS switch */
+      .ios-switch {
+        position: relative;
+        display: inline-block;
+        width: 38px;
+        height: 22px;
+      }
+      .ios-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .ios-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: #D1D5DB;
+        transition: .3s;
+        border-radius: 22px;
+      }
+      .ios-slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        transition: .3s;
+        border-radius: 50%;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      }
+      input:checked + .ios-slider {
+        background-color: #111827;
+      }
+      input:checked + .ios-slider:before {
+        transform: translateX(16px);
+      }
+
+      /* Easyblocks active selection outline matching screenshot */
+      .easyblocks-selected {
+        outline: 2px solid #3B82F6 !important;
+        position: relative;
+      }
+
+      /* Circle plus handles on top and bottom border matching screenshot */
+      .plus-handle-top {
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 20px;
+        height: 20px;
+        background-color: #3B82F6;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 14px;
+        line-height: 1;
+        cursor: pointer;
+        z-index: 30;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      }
+      .plus-handle-bottom {
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 20px;
+        height: 20px;
+        background-color: #3B82F6;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 14px;
+        line-height: 1;
+        cursor: pointer;
+        z-index: 30;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      }
+
+      /* 3x3 stack alignment matrix matching screenshot */
+      .stack-matrix {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2px;
+        width: 44px;
+        height: 44px;
+        border: 1px solid #E5E7EB;
+        border-radius: 4px;
+        padding: 3px;
+        background-color: #FAFAFA;
+      }
+      .stack-cell {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 2px;
+        cursor: pointer;
+        color: #9CA3AF;
+        transition: all 0.15s ease;
+      }
+      .stack-cell:hover {
+        background-color: #E5E7EB;
+        color: #111827;
+      }
+      .stack-cell.active {
+        background-color: #111827;
+        color: white;
+      }
+
+      /* Native select styled with right chevron matching Easyblocks screenshot */
+      select.inspector-select {
+        appearance: none;
+        -webkit-appearance: none;
+        padding-right: 14px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239CA3AF' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right center;
+        background-size: 10px;
+        cursor: pointer;
+        text-align: right;
+        border: none;
+        background-color: transparent;
+        font-weight: 500;
+        color: #111827;
+        outline: none;
+      }
+    </style>
+  </head>
+  <body class="h-screen w-screen flex flex-col bg-[#ECEEF1]">
+
+    <!-- Top Bar matching Easyblocks screenshot -->
+    <header class="h-[52px] bg-white border-b border-[#E5E7EB] px-4 flex items-center justify-between z-40 shrink-0">
+      
+      <!-- Left: Undo / Redo & Exit -->
+      <div class="flex items-center gap-3">
+        <a href="/admin/pages" class="text-xs text-gray-500 hover:text-black mr-2 flex items-center gap-1 font-medium" title="Back to All Pages">
+          &larr; <span class="hidden sm:inline">Pages</span>
+        </a>
+
+        <!-- Undo Icon -->
+        <button id="undo-btn" type="button" class="p-1.5 text-gray-700 hover:text-black rounded hover:bg-gray-100 transition-colors" title="Undo">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4" />
+          </svg>
+        </button>
+
+        <!-- Redo Icon -->
+        <button id="redo-btn" type="button" class="p-1.5 text-gray-700 hover:text-black rounded hover:bg-gray-100 transition-colors" title="Redo">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 10H11a5 5 0 00-5 5v2m15-7l-4-4m4 4l-4 4" />
+          </svg>
+        </button>
+
+        <!-- Page Selector Dropdown -->
+        <div class="ml-2 flex items-center border border-[#E5E7EB] rounded bg-[#F9FAFB] px-2.5 py-1 text-xs">
+          <span class="text-gray-400 mr-1.5">Page:</span>
+          <select id="page-select" class="bg-transparent font-semibold text-gray-800 outline-none cursor-pointer">
+            <option value="home">Home (/)</option>
+            <option value="about">About (/about)</option>
+            <option value="archives">Archives (/archives)</option>
+            <option value="materials">Materials (/materials)</option>
+            <option value="symposium-2026">Symposium 2026 (/pages/symposium-2026)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Center: Device Viewport Switcher matching screenshot -->
+      <div class="flex items-center gap-1 bg-[#F3F4F6] p-1 rounded-md">
+        <!-- Mobile -->
+        <button type="button" class="vp-btn p-1.5 rounded text-gray-600 hover:text-black transition-colors" data-vp="375" title="Mobile Phone (375px)">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+            <rect x="7" y="2" width="10" height="20" rx="2" />
+            <line x1="11" y1="18" x2="13" y2="18" />
+          </svg>
+        </button>
+
+        <!-- Tablet -->
+        <button type="button" class="vp-btn p-1.5 rounded text-gray-600 hover:text-black transition-colors" data-vp="768" title="Tablet (768px)">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+            <rect x="5" y="3" width="14" height="18" rx="2" />
+            <line x1="11" y1="18" x2="13" y2="18" />
+          </svg>
+        </button>
+
+        <!-- Laptop (Active in screenshot) -->
+        <button type="button" class="vp-btn p-1.5 rounded bg-white shadow-sm text-black transition-colors" data-vp="1024" title="Laptop (1024px)">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+            <rect x="4" y="4" width="16" height="12" rx="1.5" />
+            <line x1="2" y1="20" x2="22" y2="20" stroke-linecap="round" />
+          </svg>
+        </button>
+
+        <!-- Desktop -->
+        <button type="button" class="vp-btn p-1.5 rounded text-gray-600 hover:text-black transition-colors" data-vp="1280" title="Desktop Monitor (1280px)">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+            <rect x="2" y="3" width="20" height="14" rx="2" />
+            <line x1="8" y1="21" x2="16" y2="21" />
+            <line x1="12" y1="17" x2="12" y2="21" />
+          </svg>
+        </button>
+
+        <!-- Fullscreen / Fit -->
+        <button type="button" class="vp-btn p-1.5 rounded text-gray-600 hover:text-black transition-colors" data-vp="100%" title="Fit Screen (100%)">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Right: Edit mode toggle, Save Draft, Publish -->
+      <div class="flex items-center gap-3">
+        
+        <!-- Edit mode switch matching screenshot -->
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-gray-700 font-medium">Edit mode</span>
+          <label class="ios-switch">
+            <input id="edit-mode-toggle" type="checkbox" checked />
+            <span class="ios-slider"></span>
+          </label>
+        </div>
+
+        <span class="h-4 w-px bg-gray-200 mx-1"></span>
+
+        <!-- Save Draft (No Rebuild) -->
+        <button
+          id="save-draft-btn"
+          type="button"
+          class="px-3 py-1.5 rounded text-xs font-medium text-gray-700 bg-white border border-[#E5E7EB] hover:bg-gray-50 flex items-center gap-1.5 shadow-sm"
+          title="Saves to Git with [skip ci] - Cloudflare will NOT rebuild."
+        >
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <span>Save Draft</span>
+        </button>
+
+        <!-- Publish to Production (Triggers Rebuild) -->
+        <button
+          id="publish-btn"
+          type="button"
+          class="px-3.5 py-1.5 rounded text-xs font-semibold text-white bg-black hover:bg-gray-800 flex items-center gap-1.5 shadow-sm"
+          title="Publishes to Git without [skip ci] - Cloudflare Pages will rebuild and deploy!"
+        >
+          <span>Publish</span>
+        </button>
+
+      </div>
+
+    </header>
+
+    <!-- Main Workspace (Canvas + Right Inspector) -->
+    <div class="flex-grow flex overflow-hidden relative">
+      
+      <!-- Canvas Area matching screenshot -->
+      <div class="flex-grow overflow-y-auto flex justify-center p-6 sm:p-10" id="canvas-container">
+        <div
+          id="viewport-frame"
+          class="bg-white shadow-lg transition-all duration-300 min-h-[90vh] flex flex-col relative"
+          style="width: 1024px; max-width: 100%;"
+        >
+          <!-- Sections stack rendered here -->
+          <div id="sections-stack" class="flex flex-col flex-grow">
+            <!-- Dynamically rendered -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Inspector Sidebar matching screenshot exactly -->
+      <aside id="easyblocks-inspector" class="w-[340px] sm:w-[360px] bg-white border-l border-[#E5E7EB] h-full overflow-y-auto shrink-0 flex flex-col text-xs text-gray-800">
+        
+        <!-- Inspector Header matching screenshot -->
+        <div class="p-4 border-b border-[#E5E7EB] flex items-center justify-between">
+          <div class="relative">
+            <button id="component-type-btn" type="button" class="flex items-center gap-1.5 font-bold text-sm text-gray-900 hover:text-blue-600 focus:outline-none cursor-pointer">
+              <span id="insp-component-name">Banner Section</span>
+              <span class="text-xs text-gray-400">⌵</span>
+            </button>
+            <div id="component-type-dropdown" class="hidden absolute top-full left-0 mt-2 w-56 bg-white border border-[#E5E7EB] rounded-lg shadow-xl py-1.5 z-50 text-xs">
+              <button type="button" class="type-opt w-full text-left px-3.5 py-2 hover:bg-gray-50 flex items-center justify-between font-medium text-gray-800" data-type="HeroSectionBlock">
+                <span>Banner Section (Hero)</span>
+              </button>
+              <button type="button" class="type-opt w-full text-left px-3.5 py-2 hover:bg-gray-50 flex items-center justify-between font-medium text-gray-800" data-type="EditorialTwoColBlock">
+                <span>Editorial 2-Col Essay</span>
+              </button>
+              <button type="button" class="type-opt w-full text-left px-3.5 py-2 hover:bg-gray-50 flex items-center justify-between font-medium text-gray-800" data-type="SwatchAtlasBlock">
+                <span>Swatch Grid Atlas</span>
+              </button>
+              <button type="button" class="type-opt w-full text-left px-3.5 py-2 hover:bg-gray-50 flex items-center justify-between font-medium text-gray-800" data-type="SpecimenShowcaseBlock">
+                <span>Specimen Dossier</span>
+              </button>
+              <button type="button" class="type-opt w-full text-left px-3.5 py-2 hover:bg-gray-50 flex items-center justify-between font-medium text-gray-800" data-type="QuoteCalloutBlock">
+                <span>Quote Callout</span>
+              </button>
+              <button type="button" class="type-opt w-full text-left px-3.5 py-2 hover:bg-gray-50 flex items-center justify-between font-medium text-gray-800" data-type="GalleryTriptychBlock">
+                <span>Photo Gallery Triptych</span>
+              </button>
+              <button type="button" class="type-opt w-full text-left px-3.5 py-2 hover:bg-gray-50 flex items-center justify-between font-medium text-gray-800" data-type="NewsletterDispatchBlock">
+                <span>Newsletter CTA</span>
+              </button>
+              <button type="button" class="type-opt w-full text-left px-3.5 py-2 hover:bg-gray-50 flex items-center justify-between font-medium text-gray-800" data-type="RawMarkdownBlock">
+                <span>Custom Markdown</span>
+              </button>
+            </div>
+          </div>
+          <button id="collapse-inspector-btn" type="button" class="text-gray-400 hover:text-black text-sm px-1.5 py-0.5 rounded hover:bg-gray-100 font-bold cursor-pointer transition-colors" title="Collapse">
+            &mdash;
+          </button>
+        </div>
+
+        <div id="inspector-body" class="p-4 space-y-5">
+          
+          <!-- Section 1: Section margins matching screenshot -->
+          <div class="space-y-3">
+            <div class="font-bold text-xs text-gray-900">Section margins</div>
+            
+            <div class="flex items-center justify-between">
+              <span class="text-gray-600">Top</span>
+              <select id="prop-margin-top" class="inspector-select">
+                <option value="0">0</option>
+                <option value="16">16</option>
+                <option value="24">24</option>
+                <option value="32">32</option>
+                <option value="48">48</option>
+                <option value="64">64</option>
+              </select>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-gray-600">Bottom</span>
+              <select id="prop-margin-bottom" class="inspector-select">
+                <option value="0">0</option>
+                <option value="24">24</option>
+                <option value="48">48</option>
+                <option value="64" selected>64</option>
+                <option value="80">80</option>
+              </select>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-gray-600">Left / Right</span>
+              <select id="prop-margin-lr" class="inspector-select">
+                <option value="none">none</option>
+                <option value="standard" selected>standard</option>
+                <option value="wide">wide</option>
+              </select>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-gray-600">Max width</span>
+              <select id="prop-max-width" class="inspector-select">
+                <option value="None" selected>None</option>
+                <option value="768px">768px</option>
+                <option value="1024px">1024px</option>
+                <option value="1280px">1280px</option>
+              </select>
+            </div>
+
+            <div class="flex items-center justify-between pt-1">
+              <span class="text-gray-600">Escape</span>
+              <label class="ios-switch">
+                <input id="prop-escape-toggle" type="checkbox" checked />
+                <span class="ios-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="h-px bg-[#E5E7EB]"></div>
+
+          <!-- Section 2: Cover matching screenshot -->
+          <div class="space-y-3">
+            <div class="font-bold text-xs text-gray-900">Cover</div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-gray-600">Position</span>
+              <select id="prop-cover-pos" class="inspector-select">
+                <option value="right" selected>right</option>
+                <option value="left">left</option>
+                <option value="background">background</option>
+                <option value="none">none</option>
+              </select>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-gray-600">Vertical align</span>
+              <select id="prop-cover-valign" class="inspector-select">
+                <option value="top">top</option>
+                <option value="center">center</option>
+                <option value="bottom">bottom</option>
+                <option value="stretch" selected>stretch</option>
+              </select>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-gray-600">Width</span>
+              <select id="prop-cover-width" class="inspector-select">
+                <option value="33%">33%</option>
+                <option value="40%">40%</option>
+                <option value="50%" selected>50%</option>
+                <option value="60%">60%</option>
+                <option value="100%">100%</option>
+              </select>
+            </div>
+
+            <div class="pt-1">
+              <label class="block text-gray-500 text-[11px] mb-1">Image Source</label>
+              <div class="flex gap-2">
+                <input id="prop-image-url" type="text" class="flex-grow p-1.5 border border-[#E5E7EB] rounded text-xs" />
+                <select id="prop-image-preset" class="p-1 border border-[#E5E7EB] rounded text-[11px] bg-gray-50">
+                  <option value="">Presets...</option>
+                  <option value="/images/hero-field-notebook-flatlay.jpeg">Flatlay Notebook</option>
+                  <option value="/images/studio-researcher.jpeg">Studio Researcher</option>
+                  <option value="/images/indigo-vat-fermentation.jpeg">Indigo Vat</option>
+                  <option value="/images/research-specimens-triptych.jpeg">Specimens</option>
+                  <option value="/images/indigo-leaf-field-ledger.jpeg">Indigo Leaf</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="h-px bg-[#E5E7EB]"></div>
+
+          <!-- Section 3: Stack matching screenshot -->
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="font-bold text-xs text-gray-900">Stack</div>
+              <div class="text-gray-500 text-[11px] mt-1">Position</div>
+            </div>
+
+            <!-- 3x3 alignment matrix box matching screenshot -->
+            <div class="stack-matrix">
+              <div class="stack-cell text-[10px]" data-pos="top-left">&bull;</div>
+              <div class="stack-cell text-[10px]" data-pos="top-center">&bull;</div>
+              <div class="stack-cell text-[10px]" data-pos="top-right">&bull;</div>
+              <div class="stack-cell text-[10px]" data-pos="middle-left">&bull;</div>
+              <div class="stack-cell active text-[10px]" data-pos="center">
+                <!-- Stack bars icon from screenshot -->
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="4" y="6" width="16" height="2" rx="1" />
+                  <rect x="4" y="11" width="16" height="2" rx="1" />
+                  <rect x="4" y="16" width="16" height="2" rx="1" />
+                </svg>
+              </div>
+              <div class="stack-cell text-[10px]" data-pos="middle-right">&bull;</div>
+              <div class="stack-cell text-[10px]" data-pos="bottom-left">&bull;</div>
+              <div class="stack-cell text-[10px]" data-pos="bottom-center">&bull;</div>
+              <div class="stack-cell text-[10px]" data-pos="bottom-right">&bull;</div>
+            </div>
+          </div>
+
+          <div class="h-px bg-[#E5E7EB]"></div>
+
+          <!-- Section 4: Padding matching screenshot -->
+          <div class="space-y-3">
+            <div class="font-bold text-xs text-gray-900">Padding</div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-gray-600">Top</span>
+              <select id="prop-pad-top" class="inspector-select">
+                <option value="0" selected>0</option>
+                <option value="16">16</option>
+                <option value="24">24</option>
+                <option value="32">32</option>
+                <option value="48">48</option>
+              </select>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-gray-600">Bottom</span>
+              <select id="prop-pad-bottom" class="inspector-select">
+                <option value="0" selected>0</option>
+                <option value="16">16</option>
+                <option value="24">24</option>
+                <option value="32">32</option>
+                <option value="48">48</option>
+              </select>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-gray-600">Internal</span>
+              <select id="prop-pad-internal" class="inspector-select">
+                <option value="12">12</option>
+                <option value="16">16</option>
+                <option value="24" selected>24</option>
+                <option value="32">32</option>
+                <option value="48">48</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="h-px bg-[#E5E7EB]"></div>
+
+          <!-- Section 5: Fill matching screenshot -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="font-bold text-xs text-gray-900">Fill</div>
+              <label class="ios-switch">
+                <input id="prop-fill-enable" type="checkbox" />
+                <span class="ios-slider"></span>
+              </label>
+            </div>
+
+            <div id="fill-color-picker" class="hidden flex items-center justify-between pt-1">
+              <span class="text-gray-600">Color</span>
+              <div class="flex items-center gap-1.5">
+                <input id="prop-fill-color" type="color" value="#F4EFE6" class="w-6 h-6 border-0 p-0 rounded cursor-pointer" />
+                <span id="prop-fill-hex" class="text-[11px] font-mono text-gray-600">#F4EFE6</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="h-px bg-[#E5E7EB]"></div>
+
+          <!-- Section 6: Text Content & Buttons -->
+          <div class="space-y-3">
+            <div class="font-bold text-xs text-gray-900">Content & Typography</div>
+
+            <div>
+              <label class="block text-gray-500 text-[11px] mb-1">Heading</label>
+              <input id="prop-heading" type="text" class="w-full p-2 border border-[#E5E7EB] rounded font-semibold text-gray-900 text-xs" />
+            </div>
+
+            <div>
+              <label class="block text-gray-500 text-[11px] mb-1">Subtitle / Body Text</label>
+              <textarea id="prop-subtitle" rows="3" class="w-full p-2 border border-[#E5E7EB] rounded text-gray-800 text-xs leading-relaxed"></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-gray-500 text-[11px] mb-1">Button 1 Text</label>
+                <input id="prop-btn1-text" type="text" placeholder="Show now" class="w-full p-1.5 border border-[#E5E7EB] rounded text-xs" />
+              </div>
+              <div>
+                <label class="block text-gray-500 text-[11px] mb-1">Button 1 Link</label>
+                <input id="prop-btn1-link" type="text" placeholder="#content" class="w-full p-1.5 border border-[#E5E7EB] rounded text-xs" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-gray-500 text-[11px] mb-1">Button 2 Text</label>
+                <input id="prop-btn2-text" type="text" placeholder="Learn more" class="w-full p-1.5 border border-[#E5E7EB] rounded text-xs" />
+              </div>
+              <div>
+                <label class="block text-gray-500 text-[11px] mb-1">Button 2 Link</label>
+                <input id="prop-btn2-link" type="text" placeholder="/about" class="w-full p-1.5 border border-[#E5E7EB] rounded text-xs" />
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- Add Section Modal (Opens when clicking the blue + handle) -->
+    <div id="add-section-modal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white rounded-lg shadow-2xl max-w-lg w-full p-6 space-y-4">
+        <div class="flex items-center justify-between border-b pb-3">
+          <h3 class="font-bold text-sm text-gray-900">Add Section (Easyblocks Component)</h3>
+          <button id="close-add-modal" type="button" class="text-gray-400 hover:text-black">&times;</button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 text-xs">
+          <button type="button" class="modal-add-btn text-left p-3 border rounded hover:border-blue-500 hover:bg-blue-50/30" data-type="HeroSectionBlock">
+            <div class="font-bold text-gray-900">Hero / Banner Section</div>
+            <div class="text-[11px] text-gray-500">Title, description, buttons, cover image</div>
+          </button>
+
+          <button type="button" class="modal-add-btn text-left p-3 border rounded hover:border-blue-500 hover:bg-blue-50/30" data-type="EditorialTwoColBlock">
+            <div class="font-bold text-gray-900">Editorial 2-Column</div>
+            <div class="text-[11px] text-gray-500">Drop cap essay & studio figure image</div>
+          </button>
+
+          <button type="button" class="modal-add-btn text-left p-3 border rounded hover:border-blue-500 hover:bg-blue-50/30" data-type="SwatchAtlasBlock">
+            <div class="font-bold text-gray-900">Swatch Grid</div>
+            <div class="text-[11px] text-gray-500">Fabric swatches with binomial taxonomy</div>
+          </button>
+
+          <button type="button" class="modal-add-btn text-left p-3 border rounded hover:border-blue-500 hover:bg-blue-50/30" data-type="SpecimenShowcaseBlock">
+            <div class="font-bold text-gray-900">Specimen Dossier</div>
+            <div class="text-[11px] text-gray-500">Coordinates, archive & chemistry</div>
+          </button>
+
+          <button type="button" class="modal-add-btn text-left p-3 border rounded hover:border-blue-500 hover:bg-blue-50/30" data-type="QuoteCalloutBlock">
+            <div class="font-bold text-gray-900">Quote Callout</div>
+            <div class="text-[11px] text-gray-500">Poetic research quotation & byline</div>
+          </button>
+
+          <button type="button" class="modal-add-btn text-left p-3 border rounded hover:border-blue-500 hover:bg-blue-50/30" data-type="GalleryTriptychBlock">
+            <div class="font-bold text-gray-900">Photo Gallery Triptych</div>
+            <div class="text-[11px] text-gray-500">3-card field photo expedition</div>
+          </button>
+
+          <button type="button" class="modal-add-btn text-left p-3 border rounded hover:border-blue-500 hover:bg-blue-50/30" data-type="NewsletterDispatchBlock">
+            <div class="font-bold text-gray-900">Newsletter CTA</div>
+            <div class="text-[11px] text-gray-500">Field note subscription form</div>
+          </button>
+
+          <button type="button" class="modal-add-btn text-left p-3 border rounded hover:border-blue-500 hover:bg-blue-50/30" data-type="RawMarkdownBlock">
+            <div class="font-bold text-gray-900">Custom Markdown</div>
+            <div class="text-[11px] text-gray-500">Freeform markdown or HTML</div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-pill" class="hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-full shadow-lg font-mono text-xs z-50 text-white bg-black"></div>
+
+    <script define:vars={{ pagesPayloadJson }}>
+      window.__PAGES_DATABASE__ = JSON.parse(pagesPayloadJson);
+    </script>
+
+    <script>
+      import { getGitHubConfig, commitLandingPageToGitHub } from '../../utils/github';
+
+      interface EasyblocksBlock {
+        id: string;
+        type: string;
+        props: Record<string, any>;
+      }
+
+      const pagesDatabase: any[] = (window as any).__PAGES_DATABASE__ || [];
+      let currentPageSlug = 'home';
+      let activeBlocks: EasyblocksBlock[] = [];
+      let selectedBlockId: string | null = null;
+      let editMode = true;
+      let insertIndex = -1;
+
+      // History stack for undo/redo
+      let historyStack: string[] = [];
+      let historyIndex = -1;
+
+      function pushHistory() {
+        const snapshot = JSON.stringify(activeBlocks);
+        if (historyStack[historyIndex] !== snapshot) {
+          historyStack = historyStack.slice(0, historyIndex + 1);
+          historyStack.push(snapshot);
+          historyIndex = historyStack.length - 1;
+        }
+      }
+
+      // Load page data
+      function loadPage(slug: string) {
+        currentPageSlug = slug;
+        const pageSelect = document.getElementById('page-select') as HTMLSelectElement | null;
+        if (pageSelect) pageSelect.value = slug;
+
+        // Check localStorage first for any draft autosaves
+        const localCached = localStorage.getItem(`easyblocks_landing_${slug}`);
+        if (localCached) {
+          try {
+            const parsed = JSON.parse(localCached);
+            activeBlocks = parsed.blocks || [];
+          } catch {
+            activeBlocks = [];
+          }
+        } else {
+          const match = pagesDatabase.find((p) => p.slug === slug);
+          if (match && match.blocks) {
+            activeBlocks = JSON.parse(JSON.stringify(match.blocks));
+          } else {
+            activeBlocks = [];
+          }
+        }
+
+        if (activeBlocks.length > 0) {
+          selectedBlockId = activeBlocks[0].id;
+        } else {
+          selectedBlockId = null;
+        }
+
+        historyStack = [JSON.stringify(activeBlocks)];
+        historyIndex = 0;
+
+        renderCanvas();
+        populateInspector();
+      }
+
+      function autoSaveLocal() {
+        const payload = {
+          slug: currentPageSlug,
+          draft: true,
+          updatedAt: new Date().toISOString(),
+          blocks: activeBlocks,
+        };
+        localStorage.setItem(`easyblocks_landing_${currentPageSlug}`, JSON.stringify(payload));
+        pushHistory();
+      }
+
+      // Render the visual Canvas
+      function renderCanvas() {
+        const stack = document.getElementById('sections-stack');
+        if (!stack) return;
+        stack.innerHTML = '';
+
+        activeBlocks.forEach((block, idx) => {
+          const isSelected = block.id === selectedBlockId && editMode;
+          const sectionEl = document.createElement('div');
+          sectionEl.className = `relative transition-all duration-150 ${isSelected ? 'easyblocks-selected' : ''}`;
+          sectionEl.setAttribute('data-block-id', block.id);
+
+          // Top circle + handle if selected
+          if (isSelected) {
+            const plusTop = document.createElement('div');
+            plusTop.className = 'plus-handle-top';
+            plusTop.innerHTML = '+';
+            plusTop.title = 'Add section above';
+            plusTop.addEventListener('click', (e) => {
+              e.stopPropagation();
+              openAddModal(idx);
+            });
+            sectionEl.appendChild(plusTop);
+          }
+
+          // Render block interior matching the aesthetic
+          const innerWrapper = document.createElement('div');
+          const p = block.props;
+          const isReverse = p.coverPosition === 'left';
+          const coverPos = p.coverPosition || 'right';
+          const hasCover = p.image && coverPos !== 'none';
+          const coverW = p.coverWidth || '50%';
+          const bgCol = p.fillEnable ? (p.fillColor || '#F4EFE6') : 'white';
+
+          innerWrapper.style.marginTop = `${p.marginTop || 0}px`;
+          innerWrapper.style.marginBottom = `${p.marginBottom || 64}px`;
+          innerWrapper.style.paddingTop = `${p.paddingTop || 48}px`;
+          innerWrapper.style.paddingBottom = `${p.paddingBottom || 48}px`;
+          innerWrapper.style.backgroundColor = bgCol;
+          innerWrapper.style.paddingLeft = p.marginLeftRight === 'none' ? '0' : '24px';
+          innerWrapper.style.paddingRight = p.marginLeftRight === 'none' ? '0' : '24px';
+
+          // Block specific markup
+          if (block.type === 'HeroSectionBlock' || block.type === 'Banner Section') {
+            const stackPos = p.stackPosition || 'center';
+            const isCentered = stackPos.includes('center');
+            const isRight = stackPos.includes('right');
+            const textAlignClass = isRight ? 'text-right' : isCentered ? 'text-center' : 'text-left';
+            const itemsAlignClass = isRight ? 'items-end' : isCentered ? 'items-center' : 'items-start';
+            const justifyClass = isRight ? 'justify-end' : isCentered ? 'justify-center' : 'justify-start';
+            const coverValign = p.coverVerticalAlign || 'stretch';
+
+            innerWrapper.innerHTML = `
+              <div class="${p.escape ? 'w-full px-4 sm:px-6' : 'max-w-7xl mx-auto px-4 sm:px-6'}">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 ${coverValign === 'stretch' ? 'items-stretch' : 'items-center'} ${isReverse ? 'flex-row-reverse' : ''}" style="gap: ${p.paddingInternal !== undefined ? p.paddingInternal : 24}px;">
+                  <div class="${hasCover ? (coverW === '50%' ? 'md:col-span-6' : 'md:col-span-7') : 'md:col-span-12'} flex flex-col ${itemsAlignClass} ${textAlignClass} justify-center space-y-4 py-8 ${isReverse ? 'md:order-2' : 'md:order-1'}">
+                    ${p.tagline ? `<div class="font-mono text-xs uppercase tracking-widest text-[#5B7065] font-bold">✦ ${p.tagline} ✦</div>` : ''}
+                    <h1 class="text-4xl sm:text-5xl font-bold text-[#111827] leading-tight" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; letter-spacing: -0.02em;">
+                      ${p.title || 'Get comfy'}
+                    </h1>
+                    <p class="text-sm sm:text-base text-gray-600 leading-relaxed max-w-md ${isCentered ? 'mx-auto' : ''}" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                      ${p.subtitle || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do this is cool and gets even cooler incididunt ut labore.'}
+                    </p>
+                    <div class="pt-3 flex flex-wrap items-center gap-3 ${justifyClass}">
+                      <a href="${p.ctaLink || '#'}" class="px-5 py-2.5 rounded-md bg-[#18181B] text-white font-medium text-xs shadow-sm hover:bg-black transition-colors">
+                        ${p.ctaText || 'Show now'}
+                      </a>
+                      <a href="${p.secondaryCtaLink || '#'}" class="px-5 py-2.5 rounded-md bg-white border border-[#D4D4D8] text-[#18181B] font-medium text-xs shadow-sm hover:bg-gray-50 transition-colors">
+                        ${p.secondaryCtaText || 'Learn more'}
+                      </a>
+                    </div>
+                  </div>
+                  ${hasCover ? `
+                    <div class="${coverW === '50%' ? 'md:col-span-6' : 'md:col-span-5'} ${isReverse ? 'md:order-1' : 'md:order-2'} flex items-center">
+                      <div class="relative w-full h-full min-h-[340px] overflow-hidden rounded-md border border-[#E5E7EB] shadow-xs">
+                        <img src="${p.image || '/images/hero-field-notebook-flatlay.jpeg'}" alt="Cover" class="w-full h-full object-cover object-center" />
+                      </div>
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+            `;
+          } else if (block.type === 'EditorialTwoColBlock') {
+            innerWrapper.innerHTML = `
+              <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <h2 class="font-heading text-3xl text-[#2C4251] mb-2" style="font-family: 'Cormorant Garamond', Georgia, serif;">${p.heading || 'Editorial'}</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 font-body text-sm leading-relaxed text-[#2C4251]/80" style="font-family: 'Lora', Georgia, serif;">
+                  <p class="drop-cap">${p.col1 || ''}</p>
+                  <p>${p.col2 || ''}</p>
+                </div>
+              </div>
+            `;
+          } else if (block.type === 'SwatchAtlasBlock') {
+            innerWrapper.innerHTML = `
+              <div class="max-w-7xl mx-auto px-4 sm:px-6 text-center">
+                <h3 class="font-heading text-2xl text-[#2C4251] mb-6" style="font-family: 'Cormorant Garamond', Georgia, serif;">${p.heading || 'Swatch Grid'}</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  ${(p.swatches || []).map((s: any) => `
+                    <div class="p-3 bg-white border border-[#DCD3C1] rounded text-center">
+                      <div class="w-16 h-16 mx-auto mb-2 rounded shadow-sm" style="background-color: ${s.color};"></div>
+                      <div class="font-mono text-xs font-bold text-[#2C4251] uppercase">${s.name}</div>
+                      <div class="font-heading italic text-xs text-[#5B7065]">${s.binomial || ''}</div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+          } else if (block.type === 'QuoteCalloutBlock') {
+            innerWrapper.innerHTML = `
+              <div class="max-w-4xl mx-auto px-4 text-center py-6">
+                <blockquote class="font-heading italic text-2xl text-[#2C4251] leading-relaxed" style="font-family: 'Cormorant Garamond', Georgia, serif;">
+                  &ldquo;${p.quote || ''}&rdquo;
+                </blockquote>
+                <div class="font-mono text-xs uppercase font-bold text-[#5B7065] mt-3">${p.author || ''}</div>
+              </div>
+            `;
+          } else if (block.type === 'NewsletterDispatchBlock') {
+            innerWrapper.innerHTML = `
+              <div class="max-w-2xl mx-auto px-4 text-center">
+                <h3 class="font-heading text-2xl text-[#2C4251] mb-2" style="font-family: 'Cormorant Garamond', Georgia, serif;">${p.heading || 'Newsletter'}</h3>
+                <p class="font-body text-xs text-[#2C4251]/80 mb-4" style="font-family: 'Lora', Georgia, serif;">${p.subheading || ''}</p>
+                <div class="flex gap-2 max-w-sm mx-auto">
+                  <input type="email" placeholder="researcher@fieldnotes.org" class="flex-grow p-2 border border-[#DCD3C1] rounded text-xs" />
+                  <button class="px-4 py-2 bg-[#2C4251] text-white font-mono text-xs font-bold uppercase rounded">${p.buttonText || 'Subscribe'}</button>
+                </div>
+              </div>
+            `;
+          } else {
+            innerWrapper.innerHTML = `<div class="p-6 text-xs font-mono text-gray-500">${block.type} &bull; ${JSON.stringify(p).slice(0, 100)}...</div>`;
+          }
+
+          sectionEl.appendChild(innerWrapper);
+
+          // Bottom circle + handle if selected
+          if (isSelected) {
+            const plusBottom = document.createElement('div');
+            plusBottom.className = 'plus-handle-bottom';
+            plusBottom.innerHTML = '+';
+            plusBottom.title = 'Add section below';
+            plusBottom.addEventListener('click', (e) => {
+              e.stopPropagation();
+              openAddModal(idx + 1);
+            });
+            sectionEl.appendChild(plusBottom);
+          }
+
+          // Click to select block
+          sectionEl.addEventListener('click', () => {
+            if (!editMode) return;
+            selectedBlockId = block.id;
+            renderCanvas();
+            populateInspector();
+          });
+
+          stack.appendChild(sectionEl);
+        });
+      }
+
+      // Populate right Inspector sidebar matching screenshot
+      function populateInspector() {
+        const block = activeBlocks.find((b) => b.id === selectedBlockId);
+        const compTitle = document.getElementById('insp-component-name');
+        if (!block) {
+          if (compTitle) compTitle.textContent = 'No Section Selected';
+          return;
+        }
+
+        if (compTitle) {
+          compTitle.textContent = block.type === 'HeroSectionBlock' ? 'Banner Section' : block.type;
+        }
+
+        const p = block.props;
+
+        // Margins
+        const mTop = document.getElementById('prop-margin-top') as HTMLSelectElement | null;
+        const mBot = document.getElementById('prop-margin-bottom') as HTMLSelectElement | null;
+        const mLr = document.getElementById('prop-margin-lr') as HTMLSelectElement | null;
+        const mMax = document.getElementById('prop-max-width') as HTMLSelectElement | null;
+        if (mTop) mTop.value = String(p.marginTop || 0);
+        if (mBot) mBot.value = String(p.marginBottom !== undefined ? p.marginBottom : 64);
+        if (mLr) mLr.value = p.marginLeftRight || 'standard';
+        if (mMax) mMax.value = p.maxWidth || 'None';
+
+        // Cover
+        const cPos = document.getElementById('prop-cover-pos') as HTMLSelectElement | null;
+        const cValign = document.getElementById('prop-cover-valign') as HTMLSelectElement | null;
+        const cWidth = document.getElementById('prop-cover-width') as HTMLSelectElement | null;
+        const cImg = document.getElementById('prop-image-url') as HTMLInputElement | null;
+        if (cPos) cPos.value = p.coverPosition || 'right';
+        if (cValign) cValign.value = p.coverVerticalAlign || 'stretch';
+        if (cWidth) cWidth.value = p.coverWidth || '50%';
+        if (cImg) cImg.value = p.image || '';
+
+        // Padding
+        const pTop = document.getElementById('prop-pad-top') as HTMLSelectElement | null;
+        const pBot = document.getElementById('prop-pad-bottom') as HTMLSelectElement | null;
+        const pInt = document.getElementById('prop-pad-internal') as HTMLSelectElement | null;
+        if (pTop) pTop.value = String(p.paddingTop || 0);
+        if (pBot) pBot.value = String(p.paddingBottom || 0);
+        if (pInt) pInt.value = String(p.paddingInternal || 24);
+
+        // Fill
+        const fEnable = document.getElementById('prop-fill-enable') as HTMLInputElement | null;
+        const fColor = document.getElementById('prop-fill-color') as HTMLInputElement | null;
+        const fHex = document.getElementById('prop-fill-hex');
+        const fPicker = document.getElementById('fill-color-picker');
+        if (fEnable) {
+          fEnable.checked = Boolean(p.fillEnable);
+          if (fPicker) fPicker.classList.toggle('hidden', !p.fillEnable);
+        }
+        if (fColor && p.fillColor) {
+          fColor.value = p.fillColor;
+          if (fHex) fHex.textContent = p.fillColor;
+        }
+
+        // Text Content
+        const hInput = document.getElementById('prop-heading') as HTMLInputElement | null;
+        const sInput = document.getElementById('prop-subtitle') as HTMLTextAreaElement | null;
+        const b1Text = document.getElementById('prop-btn1-text') as HTMLInputElement | null;
+        const b1Link = document.getElementById('prop-btn1-link') as HTMLInputElement | null;
+        const b2Text = document.getElementById('prop-btn2-text') as HTMLInputElement | null;
+        const b2Link = document.getElementById('prop-btn2-link') as HTMLInputElement | null;
+
+        if (hInput) hInput.value = p.title || p.heading || '';
+        if (sInput) sInput.value = p.subtitle || p.subheading || p.col1 || '';
+        if (b1Text) b1Text.value = p.ctaText || '';
+        if (b1Link) b1Link.value = p.ctaLink || '';
+        if (b2Text) b2Text.value = p.secondaryCtaText || '';
+        if (b2Link) b2Link.value = p.secondaryCtaLink || '';
+
+        // Escape toggle
+        const escToggle = document.getElementById('prop-escape-toggle') as HTMLInputElement | null;
+        if (escToggle) escToggle.checked = p.escape !== undefined ? Boolean(p.escape) : true;
+
+        // Stack 3x3 matrix active position
+        const currentPos = p.stackPosition || 'center';
+        document.querySelectorAll('.stack-cell').forEach((c) => {
+          const pos = c.getAttribute('data-pos');
+          if (pos === currentPos) {
+            c.classList.add('active');
+            c.innerHTML = `
+              <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="4" y="6" width="16" height="2" rx="1" />
+                <rect x="4" y="11" width="16" height="2" rx="1" />
+                <rect x="4" y="16" width="16" height="2" rx="1" />
+              </svg>
+            `;
+          } else {
+            c.classList.remove('active');
+            c.innerHTML = '&bull;';
+          }
+        });
+      }
+
+      // Wire Inspector Inputs
+      function attachInspectorListeners() {
+        const updateProp = (key: string, val: any) => {
+          const block = activeBlocks.find((b) => b.id === selectedBlockId);
+          if (block) {
+            block.props[key] = val;
+            autoSaveLocal();
+            renderCanvas();
+          }
+        };
+
+        // 3x3 stack matrix click handlers
+        document.querySelectorAll('.stack-cell').forEach((cell) => {
+          cell.addEventListener('click', () => {
+            const pos = cell.getAttribute('data-pos') || 'center';
+            const block = activeBlocks.find((b) => b.id === selectedBlockId);
+            if (block) {
+              block.props.stackPosition = pos;
+              autoSaveLocal();
+              renderCanvas();
+              populateInspector();
+            }
+          });
+        });
+
+        // Escape toggle
+        document.getElementById('prop-escape-toggle')?.addEventListener('change', (e) => {
+          updateProp('escape', (e.target as HTMLInputElement).checked);
+        });
+
+        // Collapse inspector
+        document.getElementById('collapse-inspector-btn')?.addEventListener('click', () => {
+          document.getElementById('inspector-body')?.classList.toggle('hidden');
+        });
+
+        // Component type dropdown toggle
+        const typeBtn = document.getElementById('component-type-btn');
+        const typeMenu = document.getElementById('component-type-dropdown');
+        typeBtn?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          typeMenu?.classList.toggle('hidden');
+        });
+        document.addEventListener('click', () => {
+          typeMenu?.classList.add('hidden');
+        });
+
+        // Component type changer
+        document.querySelectorAll('.type-opt').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const newType = btn.getAttribute('data-type');
+            const block = activeBlocks.find((b) => b.id === selectedBlockId);
+            if (block && newType) {
+              block.type = newType;
+              typeMenu?.classList.add('hidden');
+              autoSaveLocal();
+              renderCanvas();
+              populateInspector();
+            }
+          });
+        });
+
+        document.getElementById('prop-margin-top')?.addEventListener('change', (e) => updateProp('marginTop', parseInt((e.target as HTMLSelectElement).value, 10)));
+        document.getElementById('prop-margin-bottom')?.addEventListener('change', (e) => updateProp('marginBottom', parseInt((e.target as HTMLSelectElement).value, 10)));
+        document.getElementById('prop-margin-lr')?.addEventListener('change', (e) => updateProp('marginLeftRight', (e.target as HTMLSelectElement).value));
+        document.getElementById('prop-max-width')?.addEventListener('change', (e) => updateProp('maxWidth', (e.target as HTMLSelectElement).value));
+
+        document.getElementById('prop-cover-pos')?.addEventListener('change', (e) => updateProp('coverPosition', (e.target as HTMLSelectElement).value));
+        document.getElementById('prop-cover-valign')?.addEventListener('change', (e) => updateProp('coverVerticalAlign', (e.target as HTMLSelectElement).value));
+        document.getElementById('prop-cover-width')?.addEventListener('change', (e) => updateProp('coverWidth', (e.target as HTMLSelectElement).value));
+
+        document.getElementById('prop-image-url')?.addEventListener('input', (e) => updateProp('image', (e.target as HTMLInputElement).value));
+        document.getElementById('prop-image-preset')?.addEventListener('change', (e) => {
+          const val = (e.target as HTMLSelectElement).value;
+          if (val) {
+            (document.getElementById('prop-image-url') as HTMLInputElement).value = val;
+            updateProp('image', val);
+          }
+        });
+
+        document.getElementById('prop-pad-top')?.addEventListener('change', (e) => updateProp('paddingTop', parseInt((e.target as HTMLSelectElement).value, 10)));
+        document.getElementById('prop-pad-bottom')?.addEventListener('change', (e) => updateProp('paddingBottom', parseInt((e.target as HTMLSelectElement).value, 10)));
+        document.getElementById('prop-pad-internal')?.addEventListener('change', (e) => updateProp('paddingInternal', parseInt((e.target as HTMLSelectElement).value, 10)));
+
+        document.getElementById('prop-fill-enable')?.addEventListener('change', (e) => {
+          const checked = (e.target as HTMLInputElement).checked;
+          document.getElementById('fill-color-picker')?.classList.toggle('hidden', !checked);
+          updateProp('fillEnable', checked);
+        });
+
+        document.getElementById('prop-fill-color')?.addEventListener('input', (e) => {
+          const val = (e.target as HTMLInputElement).value;
+          const hexEl = document.getElementById('prop-fill-hex');
+          if (hexEl) hexEl.textContent = val;
+          updateProp('fillColor', val);
+        });
+
+        document.getElementById('prop-heading')?.addEventListener('input', (e) => {
+          const val = (e.target as HTMLInputElement).value;
+          const block = activeBlocks.find((b) => b.id === selectedBlockId);
+          if (block) {
+            block.props.title = val;
+            block.props.heading = val;
+            autoSaveLocal();
+            renderCanvas();
+          }
+        });
+
+        document.getElementById('prop-subtitle')?.addEventListener('input', (e) => {
+          const val = (e.target as HTMLTextAreaElement).value;
+          const block = activeBlocks.find((b) => b.id === selectedBlockId);
+          if (block) {
+            block.props.subtitle = val;
+            block.props.subheading = val;
+            autoSaveLocal();
+            renderCanvas();
+          }
+        });
+
+        document.getElementById('prop-btn1-text')?.addEventListener('input', (e) => updateProp('ctaText', (e.target as HTMLInputElement).value));
+        document.getElementById('prop-btn1-link')?.addEventListener('input', (e) => updateProp('ctaLink', (e.target as HTMLInputElement).value));
+        document.getElementById('prop-btn2-text')?.addEventListener('input', (e) => updateProp('secondaryCtaText', (e.target as HTMLInputElement).value));
+        document.getElementById('prop-btn2-link')?.addEventListener('input', (e) => updateProp('secondaryCtaLink', (e.target as HTMLInputElement).value));
+      }
+
+      // Add Section Modal Handling
+      function openAddModal(atIndex: number) {
+        insertIndex = atIndex;
+        document.getElementById('add-section-modal')?.classList.remove('hidden');
+      }
+
+      document.getElementById('close-add-modal')?.addEventListener('click', () => {
+        document.getElementById('add-section-modal')?.classList.add('hidden');
+      });
+
+      document.querySelectorAll('.modal-add-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const type = btn.getAttribute('data-type') || 'HeroSectionBlock';
+          let defaultProps: Record<string, any> = {};
+
+          if (type === 'HeroSectionBlock') {
+            defaultProps = {
+              title: 'Get comfy with Botanical Dyes',
+              subtitle: 'Blending molecular chemistry with the art of traditional textiles.',
+              tagline: 'SPECIAL FIELD EDITION',
+              image: '/images/hero-field-notebook-flatlay.jpeg',
+              ctaText: 'Show now',
+              ctaLink: '#content',
+              secondaryCtaText: 'Learn more',
+              secondaryCtaLink: '/about',
+              coverPosition: 'right',
+              coverWidth: '50%',
+              marginTop: 0,
+              marginBottom: 64,
+              paddingInternal: 24,
+              fillEnable: true,
+              fillColor: '#F4EFE6',
+            };
+          } else if (type === 'EditorialTwoColBlock') {
+            defaultProps = {
+              heading: 'The Researcher & Artist',
+              col1: 'Natural dyes represent one of humanity\'s earliest and most sophisticated organic biotechnologies.',
+              col2: 'Through field research and studio practice, I investigate the intricate fermentation of indigo...',
+              marginTop: 0,
+              marginBottom: 48,
+            };
+          } else if (type === 'SwatchAtlasBlock') {
+            defaultProps = {
+              heading: 'The Living Color Atlas',
+              swatches: [
+                { name: 'Indigo Deep', binomial: 'Indigofera tinctoria', color: '#2C4251' },
+                { name: 'Madder Red', binomial: 'Rubia tinctorum', color: '#943D36' },
+                { name: 'Weld Ochre', binomial: 'Reseda luteola', color: '#C98E3A' },
+                { name: 'Botanical Sage', binomial: 'Salvia officinalis', color: '#5B7065' },
+              ],
+            };
+          } else if (type === 'QuoteCalloutBlock') {
+            defaultProps = {
+              quote: 'A natural dye is not a static color; it is a geographic signature of soil, water, and human hands.',
+              author: 'Dr. E. Archer',
+            };
+          } else {
+            defaultProps = {
+              heading: 'Receive Field Notes',
+              subheading: 'Postal dispatches covering new dye fermentations.',
+              buttonText: 'Subscribe',
+            };
+          }
+
+          const newBlock: EasyblocksBlock = {
+            id: `blk-${Date.now()}`,
+            type,
+            props: defaultProps,
+          };
+
+          if (insertIndex >= 0 && insertIndex <= activeBlocks.length) {
+            activeBlocks.splice(insertIndex, 0, newBlock);
+          } else {
+            activeBlocks.push(newBlock);
+          }
+
+          selectedBlockId = newBlock.id;
+          document.getElementById('add-section-modal')?.classList.add('hidden');
+          autoSaveLocal();
+          renderCanvas();
+          populateInspector();
+        });
+      });
+
+      // Viewport switcher
+      document.querySelectorAll('.vp-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.vp-btn').forEach((b) => b.classList.remove('bg-white', 'shadow-sm', 'text-black'));
+          btn.classList.add('bg-white', 'shadow-sm', 'text-black');
+
+          const vp = btn.getAttribute('data-vp') || '1024';
+          const frame = document.getElementById('viewport-frame');
+          if (frame) {
+            frame.style.width = vp === '100%' ? '100%' : `${vp}px`;
+          }
+        });
+      });
+
+      // Edit mode toggle
+      document.getElementById('edit-mode-toggle')?.addEventListener('change', (e) => {
+        editMode = (e.target as HTMLInputElement).checked;
+        const inspector = document.getElementById('easyblocks-inspector');
+        if (inspector) {
+          inspector.style.display = editMode ? 'flex' : 'none';
+        }
+        renderCanvas();
+      });
+
+      // Page select dropdown
+      document.getElementById('page-select')?.addEventListener('change', (e) => {
+        const slug = (e.target as HTMLSelectElement).value;
+        loadPage(slug);
+      });
+
+      // Undo / Redo
+      document.getElementById('undo-btn')?.addEventListener('click', () => {
+        if (historyIndex > 0) {
+          historyIndex--;
+          activeBlocks = JSON.parse(historyStack[historyIndex]);
+          renderCanvas();
+          populateInspector();
+        }
+      });
+      document.getElementById('redo-btn')?.addEventListener('click', () => {
+        if (historyIndex < historyStack.length - 1) {
+          historyIndex++;
+          activeBlocks = JSON.parse(historyStack[historyIndex]);
+          renderCanvas();
+          populateInspector();
+        }
+      });
+
+      // Toast notification
+      function showToast(msg: string) {
+        const toast = document.getElementById('toast-pill');
+        if (!toast) return;
+        toast.textContent = msg;
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 3500);
+      }
+
+      // Save Draft / Publish
+      async function handleSave(isDraft: boolean) {
+        const landingDoc = {
+          title: `Page: ${currentPageSlug}`,
+          slug: currentPageSlug,
+          description: `Custom page for ${currentPageSlug}`,
+          draft: isDraft,
+          updatedAt: new Date().toISOString(),
+          blocks: activeBlocks,
+        };
+
+        // 1. Save local
+        localStorage.setItem(`easyblocks_landing_${currentPageSlug}`, JSON.stringify(landingDoc));
+
+        // 2. Commit to GitHub
+        const config = getGitHubConfig();
+        if (config && config.token && config.owner && config.repo) {
+          try {
+            await commitLandingPageToGitHub(config, currentPageSlug, landingDoc);
+            showToast(
+              isDraft
+                ? 'Draft saved to Git with [skip ci] (Cloudflare rebuild skipped)!'
+                : 'Published to Git! Cloudflare Pages rebuild triggered.'
+            );
+          } catch (err: any) {
+            showToast(`GitHub Error: ${err.message}`);
+          }
+        } else {
+          showToast('Changes saved locally in browser! Connect GitHub to commit.');
+        }
+      }
+
+      document.getElementById('save-draft-btn')?.addEventListener('click', () => handleSave(true));
+      document.getElementById('publish-btn')?.addEventListener('click', () => handleSave(false));
+
+      // Check URL query param ?page=...
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryPage = urlParams.get('page') || urlParams.get('slug') || 'home';
+
+      // Initialize
+      attachInspectorListeners();
+      loadPage(queryPage);
+    </script>
+  </body>
+</html>
