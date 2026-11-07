@@ -1,0 +1,13 @@
+# Cloudflare Pages configuration for Astro
+# https://developers.cloudflare.com/pages/platform/wrangler/
+
+name = "geographies-natural-dyes"
+compatibility_date = "2026-11-07"
+
+[build]
+command = "npm run build"
+functions = "src/functions"
+publish = "dist"
+
+[env.production]
+name = "geographies-natural-dyes"
