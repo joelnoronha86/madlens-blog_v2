@@ -3,14 +3,14 @@
   "slug": "test-page",
   "description": "Custom page for test-page",
   "draft": true,
-  "updatedAt": "2026-11-07T22:37:06.123Z",
+  "updatedAt": "2026-11-07T22:38:07.156Z",
   "blocks": [
     {
-      "id": "blk-1794091018123-hero",
+      "id": "blk-1794091082223-hero",
       "type": "HeroSectionBlock",
       "props": {
         "title": "Test Page",
-        "subtitle": "Test page description",
+        "subtitle": "Test Page Description",
         "tagline": "SPECIAL FIELD EDITION",
         "image": "",
         "ctaText": "Show now",
@@ -27,7 +27,7 @@
       }
     },
     {
-      "id": "blk-1794091018123-editorial",
+      "id": "blk-1794091082223-editorial",
       "type": "EditorialTwoColBlock",
       "props": {
         "heading": "Field Observations & Historical Context",
