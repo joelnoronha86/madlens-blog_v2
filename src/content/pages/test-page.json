@@ -1,0 +1,41 @@
+{
+  "title": "Page: test-page",
+  "slug": "test-page",
+  "description": "Custom page for test-page",
+  "draft": true,
+  "updatedAt": "2026-11-07T22:37:06.123Z",
+  "blocks": [
+    {
+      "id": "blk-1794091018123-hero",
+      "type": "HeroSectionBlock",
+      "props": {
+        "title": "Test Page",
+        "subtitle": "Test page description",
+        "tagline": "SPECIAL FIELD EDITION",
+        "image": "",
+        "ctaText": "Show now",
+        "ctaLink": "#content",
+        "secondaryCtaText": "Learn more",
+        "secondaryCtaLink": "/about",
+        "coverPosition": "right",
+        "coverWidth": "50%",
+        "marginTop": 0,
+        "marginBottom": 64,
+        "paddingInternal": 24,
+        "fillEnable": true,
+        "fillColor": "#F4EFE6"
+      }
+    },
+    {
+      "id": "blk-1794091018123-editorial",
+      "type": "EditorialTwoColBlock",
+      "props": {
+        "heading": "Field Observations & Historical Context",
+        "col1": "Natural dyes represent one of humanity's earliest and most sophisticated organic biotechnologies...",
+        "col2": "Through careful investigation of mordant chemistry and botanical extraction...",
+        "marginTop": 0,
+        "marginBottom": 48
+      }
+    }
+  ]
+}
