@@ -2,8 +2,8 @@
   "title": "Page: test-page",
   "slug": "test-page",
   "description": "Custom page for test-page",
-  "draft": true,
-  "updatedAt": "2026-11-07T22:38:07.156Z",
+  "draft": false,
+  "updatedAt": "2026-11-07T22:39:21.623Z",
   "blocks": [
     {
       "id": "blk-1794091082223-hero",
