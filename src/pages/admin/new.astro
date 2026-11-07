@@ -18,6 +18,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
             <span id="draft-status-pill" class="px-2 py-0.5 rounded text-[10px] bg-amber-100 text-amber-800 border border-amber-300 font-bold">
               UNSAVED
             </span>
+            <span class="px-2 py-0.5 rounded text-[10px] bg-parchment-deep text-sage-botanical border border-parchment-border font-mono hidden sm:inline-block" title="Draft commits include [skip ci] so Cloudflare Pages will not build until published.">
+              CI: SKIP ON DRAFT
+            </span>
           </div>
           <h1 class="font-heading text-3xl sm:text-4xl text-indigo-deep">
             Author New Monograph
@@ -638,7 +641,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         }
 
         const msg = isDraft
-          ? `Draft successfully committed to GitHub (${config.owner}/${config.repo} at ${slug}) with draft: true!`
+          ? `Draft committed to GitHub with [skip ci]! Cloudflare Pages build skipped (no rebuild triggered).`
           : `Monograph published to GitHub! Cloudflare Pages build triggered. Live in 30-60 seconds!`;
 
         showToast(msg, 'success');

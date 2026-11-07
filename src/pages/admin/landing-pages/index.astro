@@ -1,0 +1,183 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const localPages = await getCollection('pages');
+const initialPagesJson = JSON.stringify(
+  localPages.map((p) => ({
+    name: p.id,
+    slug: p.data.slug || p.id.replace(/\.json$/, ''),
+    title: p.data.title,
+    description: p.data.description || '',
+    isDraft: Boolean(p.data.draft),
+    blocksCount: p.data.blocks?.length || 0,
+    updatedAt: p.data.updatedAt || '',
+  }))
+);
+---
+
+<BaseLayout
+  title="Landing Pages | Easyblocks Visual Studio"
+  description="Build and manage custom visual landing pages with Easyblocks."
+>
+  <div class="py-10 bg-parchment-base min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Studio Header with Tabs -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-parchment-border pb-6 mb-8">
+        <div>
+          <div class="flex items-center gap-2 font-mono text-xs text-sage-botanical uppercase tracking-wider mb-1">
+            <span>WRITER STUDIO</span>
+            <span>&bull;</span>
+            <span class="px-2 py-0.5 rounded text-[10px] bg-indigo-soft text-indigo-deep border border-indigo-deep/20 font-bold">
+              EASYBLOCKS PAGE BUILDER
+            </span>
+          </div>
+          <h1 class="font-heading text-3xl sm:text-4xl text-indigo-deep">
+            Landing Pages Studio
+          </h1>
+          <p class="font-body text-xs sm:text-sm text-indigo-deep/80 mt-1">
+            Design rich, component-driven landing pages, symposia, and exhibitions using Easyblocks No-Code components.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <a
+            href="/admin"
+            class="px-4 py-2 rounded border border-indigo-deep/30 bg-parchment-light hover:bg-parchment-deep text-indigo-deep font-mono text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-sm"
+          >
+            &larr; Tiptap Articles
+          </a>
+
+          <a
+            href="/admin/landing-pages/new"
+            class="px-5 py-2 rounded bg-indigo-deep hover:bg-madder-red text-parchment-light font-mono text-xs uppercase tracking-widest font-bold transition-all shadow-sm flex items-center gap-2"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Create Landing Page</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Studio Mode Navigation Tabs -->
+      <div class="flex items-center gap-3 mb-8 border-b border-parchment-border pb-3 font-mono text-xs uppercase tracking-wider">
+        <a
+          href="/admin"
+          class="px-4 py-2 rounded text-indigo-deep hover:bg-parchment-light border border-transparent transition-colors"
+        >
+          Long-Form Essays (Tiptap)
+        </a>
+        <a
+          href="/admin/landing-pages"
+          class="px-4 py-2 rounded bg-indigo-deep text-parchment-light font-bold shadow-sm"
+        >
+          Custom Landing Pages (Easyblocks)
+        </a>
+      </div>
+
+      <!-- CI / Deployment Notice -->
+      <div class="mb-8 p-4 bg-parchment-light border border-parchment-border rounded-sm flex items-start sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></div>
+          <div class="font-mono text-xs text-indigo-deep">
+            <strong>SMART CI SKIP ENABLED:</strong> Saving drafts attaches <code class="bg-parchment-deep px-1.5 py-0.5 rounded text-madder-red font-bold">[skip ci]</code> to Git commits. Cloudflare Pages skips rebuilding until you click <strong>Publish to Production</strong>.
+          </div>
+        </div>
+        <span class="hidden md:inline-block font-mono text-[11px] text-sage-botanical uppercase">
+          Zero wasted build minutes
+        </span>
+      </div>
+
+      <!-- Landing Pages Table -->
+      <div class="bg-parchment-light border border-parchment-border rounded-sm shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-parchment-border bg-parchment-deep/50 font-mono text-[11px] text-sage-botanical uppercase tracking-wider">
+                <th class="py-3 px-4 sm:px-6">Status</th>
+                <th class="py-3 px-4 sm:px-6">Landing Page Title</th>
+                <th class="py-3 px-4 sm:px-6 hidden md:table-cell">URL Route</th>
+                <th class="py-3 px-4 sm:px-6 hidden sm:table-cell">Blocks</th>
+                <th class="py-3 px-4 sm:px-6 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="pages-table-body" class="divide-y divide-parchment-border/60 font-mono text-xs">
+              <!-- Rendered via script -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</BaseLayout>
+
+<script define:vars={{ initialPagesJson }}>
+  const initialPages = JSON.parse(initialPagesJson);
+  let pages = [...initialPages];
+
+  function renderTable() {
+    const tbody = document.getElementById('pages-table-body');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (pages.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="py-8 text-center text-sage-botanical font-mono text-xs">
+            No landing pages found. Click "Create Landing Page" to design your first Easyblocks page!
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    pages.forEach((p) => {
+      const tr = document.createElement('tr');
+      tr.className = 'hover:bg-parchment-base/70 transition-colors';
+
+      const statusBadge = p.isDraft
+        ? `<span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-madder-soft text-madder-red border border-madder-light/40">DRAFT</span>`
+        : `<span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">PUBLISHED</span>`;
+
+      tr.innerHTML = `
+        <td class="py-4 px-4 sm:px-6 whitespace-nowrap">${statusBadge}</td>
+        <td class="py-4 px-4 sm:px-6">
+          <div class="font-heading text-lg sm:text-xl font-bold text-indigo-deep hover:text-madder-red">
+            <a href="/admin/landing-pages/edit?slug=${encodeURIComponent(p.slug)}">${p.title}</a>
+          </div>
+          ${p.description ? `<div class="font-body text-xs text-indigo-deep/70 line-clamp-1 mt-0.5">${p.description}</div>` : ''}
+        </td>
+        <td class="py-4 px-4 sm:px-6 hidden md:table-cell text-sage-botanical text-xs font-mono">
+          /pages/${p.slug}
+        </td>
+        <td class="py-4 px-4 sm:px-6 hidden sm:table-cell text-sage-botanical text-xs">
+          ${p.blocksCount} Blocks
+        </td>
+        <td class="py-4 px-4 sm:px-6 text-right whitespace-nowrap">
+          <div class="flex items-center justify-end gap-2">
+            <a
+              href="/admin/preview/pages/${p.slug}"
+              class="px-2.5 py-1 rounded border border-indigo-deep/30 bg-parchment-base hover:bg-indigo-deep hover:text-parchment-light text-indigo-deep text-[11px] uppercase tracking-wider"
+              title="Preview in full layout"
+            >
+              Preview
+            </a>
+            <a
+              href="/admin/landing-pages/edit?slug=${encodeURIComponent(p.slug)}"
+              class="px-2.5 py-1 rounded bg-indigo-deep hover:bg-madder-red text-parchment-light text-[11px] uppercase tracking-wider font-bold"
+            >
+              Edit Blocks
+            </a>
+          </div>
+        </td>
+      `;
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  renderTable();
+</script>

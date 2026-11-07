@@ -69,6 +69,36 @@ const initialPostsJson = JSON.stringify(
         </div>
       </div>
 
+      <!-- Studio Mode Navigation Tabs -->
+      <div class="flex items-center gap-3 mb-8 border-b border-parchment-border pb-3 font-mono text-xs uppercase tracking-wider">
+        <a
+          href="/admin"
+          class="px-4 py-2 rounded bg-indigo-deep text-parchment-light font-bold shadow-sm"
+        >
+          Long-Form Essays (Tiptap)
+        </a>
+        <a
+          href="/admin/landing-pages"
+          class="px-4 py-2 rounded text-indigo-deep hover:bg-parchment-light border border-transparent transition-colors flex items-center gap-1.5"
+        >
+          <span>Custom Landing Pages (Easyblocks)</span>
+          <span class="px-1.5 py-0.5 rounded text-[10px] bg-parchment-deep text-sage-botanical font-bold">NEW</span>
+        </a>
+      </div>
+
+      <!-- Cloudflare Continuous Deployment & CI Skip Banner -->
+      <div class="mb-8 p-4 bg-parchment-light border border-parchment-border rounded-sm flex items-start sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></div>
+          <div class="font-mono text-xs text-indigo-deep">
+            <strong>CLOUDFLARE BUILD REBUILD POLICY:</strong> Rapid draft saves automatically append <code class="bg-parchment-deep px-1.5 py-0.5 rounded text-madder-red font-bold">[skip ci]</code> to Git commits. Cloudflare Pages skips rebuilding until you click <strong>Publish to Production</strong>.
+          </div>
+        </div>
+        <span class="hidden md:inline-block font-mono text-[11px] text-sage-botanical uppercase">
+          Zero wasted build minutes
+        </span>
+      </div>
+
       <!-- Quick Stats & Status Banner -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <div class="bg-parchment-light border border-parchment-border p-4 rounded-sm shadow-sm">

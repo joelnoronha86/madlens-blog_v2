@@ -1,0 +1,64 @@
+---
+interface Item {
+  title: string;
+  image: string;
+  tag?: string;
+  caption?: string;
+}
+
+interface Props {
+  heading?: string;
+  items?: Item[];
+}
+
+const {
+  heading = 'Fieldwork Observations',
+  items = [
+    { title: 'Indigo Vat Fermentation', image: '/images/indigo-vat-fermentation.jpeg', tag: 'FERMENTATION', caption: 'Sindh, Indus Valley' },
+    { title: 'Madder & Weld Triptych', image: '/images/research-specimens-triptych.jpeg', tag: 'RHIZOMES', caption: 'Anatolian Plateau' },
+    { title: 'Botanical Herbarium Desk', image: '/images/hero-field-notebook-flatlay.jpeg', tag: 'HERBARIUM', caption: 'Studio Archive' },
+  ],
+} = Astro.props;
+---
+
+<section class="py-16 bg-parchment-light border-b border-parchment-border">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    {heading && (
+      <div class="mb-8">
+        <h2 class="font-heading text-3xl sm:text-4xl text-indigo-deep">
+          {heading}
+        </h2>
+      </div>
+    )}
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {items.map((item) => (
+        <div class="bg-parchment-base border border-parchment-border p-2 rounded-sm shadow-sm group">
+          <div class="aspect-[4/3] overflow-hidden rounded-sm bg-parchment-deep">
+            <img
+              src={item.image}
+              alt={item.title}
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+            />
+          </div>
+          <div class="p-3">
+            {item.tag && (
+              <span class="font-mono text-[10px] text-madder-red uppercase tracking-wider font-bold">
+                {item.tag}
+              </span>
+            )}
+            <h4 class="font-heading text-xl text-indigo-deep mt-0.5">
+              {item.title}
+            </h4>
+            {item.caption && (
+              <p class="font-mono text-xs text-sage-botanical mt-1">
+                {item.caption}
+              </p>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

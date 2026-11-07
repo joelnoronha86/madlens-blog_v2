@@ -1,0 +1,72 @@
+---
+interface Props {
+  title?: string;
+  subtitle?: string;
+  tagline?: string;
+  image?: string;
+  ctaText?: string;
+  ctaLink?: string;
+  accentColor?: string;
+}
+
+const {
+  title = 'Geographies of Natural Dyes',
+  subtitle = 'Where Chemistry Meets Living Color',
+  tagline = 'VOL. I • SPECIAL FIELD EDITION',
+  image = '/images/hero-field-notebook-flatlay.jpeg',
+  ctaText = 'Explore Field Logs',
+  ctaLink = '#content',
+  accentColor = '#2C4251',
+} = Astro.props;
+---
+
+<section class="relative bg-parchment-base border-b border-parchment-border py-16 lg:py-24 overflow-hidden">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+      
+      <div class="lg:col-span-7 space-y-5">
+        {tagline && (
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-parchment-deep border border-parchment-border font-mono text-xs uppercase tracking-widest text-sage-botanical font-bold">
+            <span>✦ {tagline} ✦</span>
+          </div>
+        )}
+
+        <h1 class="font-heading text-4xl sm:text-5xl lg:text-6xl text-indigo-deep font-semibold leading-[1.1] tracking-tight">
+          {title}
+        </h1>
+
+        {subtitle && (
+          <p class="font-heading italic text-xl sm:text-2xl text-sage-botanical max-w-xl">
+            {subtitle}
+          </p>
+        )}
+
+        {ctaText && (
+          <div class="pt-4">
+            <a
+              href={ctaLink}
+              class="inline-block px-6 py-3 rounded text-parchment-light font-mono text-xs uppercase tracking-widest font-bold shadow-sm transition-all hover:opacity-90"
+              style={`background-color: ${accentColor};`}
+            >
+              {ctaText} &rarr;
+            </a>
+          </div>
+        )}
+      </div>
+
+      {image && (
+        <div class="lg:col-span-5">
+          <div class="relative p-2 bg-parchment-light border border-parchment-border shadow-lg rounded-sm transform lg:rotate-1 hover:rotate-0 transition-transform duration-300">
+            <img
+              src={image}
+              alt={title}
+              class="w-full h-auto object-cover rounded-sm"
+              loading="lazy"
+            />
+          </div>
+        </div>
+      )}
+
+    </div>
+  </div>
+</section>

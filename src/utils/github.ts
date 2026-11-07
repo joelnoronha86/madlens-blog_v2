@@ -9,6 +9,33 @@ export interface GitHubConfig {
   repo: string;
   branch: string;
   postsPath: string;
+  pagesPath?: string;
+}
+
+export interface EasyblocksBlock {
+  id: string;
+  type: string;
+  props: Record<string, any>;
+}
+
+export interface LandingPageDocument {
+  id?: string;
+  title: string;
+  slug: string;
+  description?: string;
+  draft: boolean;
+  updatedAt?: string;
+  blocks: EasyblocksBlock[];
+}
+
+export interface GitLandingPageFile {
+  name: string;
+  slug: string;
+  path: string;
+  sha: string;
+  download_url?: string;
+  page?: LandingPageDocument;
+  isDraft: boolean;
 }
 
 export interface PostFrontmatter {
@@ -334,8 +361,11 @@ export async function commitPostToGitHub(
   const fullMarkdown = serializeMarkdownWithFrontmatter(frontmatter, markdownBody);
   const base64Content = utf8ToBase64(fullMarkdown);
 
-  const actionText = frontmatter.draft ? 'Save draft' : 'Publish post';
-  const commitMessage = `${actionText}: ${frontmatter.title} [skip ci]`;
+  // CRITICAL: Drafts include [skip ci] so Cloudflare Pages avoids costly/unnecessary rebuilds.
+  // Publishing explicitly OMITS [skip ci] so Cloudflare Pages triggers the static deployment immediately!
+  const commitMessage = frontmatter.draft
+    ? `Draft: ${frontmatter.title} [skip ci]`
+    : `Publish to production: ${frontmatter.title}`;
 
   const payload: any = {
     message: commitMessage,
@@ -413,5 +443,172 @@ export async function deletePostFromGitHub(
   if (!res.ok) {
     const errorBody = await res.text();
     throw new Error(`Failed to delete file (${res.status}): ${errorBody}`);
+  }
+}
+
+/**
+ * Fetch all Easyblocks landing pages from GitHub
+ */
+export async function fetchGitHubLandingPages(config: GitHubConfig): Promise<GitLandingPageFile[]> {
+  const { owner, repo, branch, pagesPath = 'src/content/pages', token } = config;
+  const cleanPath = pagesPath.replace(/^\/+|\/+$/g, '');
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${cleanPath}?ref=${branch}`;
+
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/vnd.github.v3+json',
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`GitHub API error: ${res.status} ${res.statusText}`);
+  }
+
+  const files = await res.json();
+  const jsonFiles = Array.isArray(files) ? files.filter(f => f.name.endsWith('.json')) : [];
+
+  const pages: GitLandingPageFile[] = [];
+
+  for (const file of jsonFiles) {
+    try {
+      const fileRes = await fetch(file.url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/vnd.github.v3+json',
+        },
+      });
+
+      if (fileRes.ok) {
+        const fileData = await fileRes.json();
+        const decoded = base64ToUtf8(fileData.content);
+        const pageDoc: LandingPageDocument = JSON.parse(decoded);
+
+        pages.push({
+          name: file.name,
+          slug: file.name.replace(/\.json$/, ''),
+          path: file.path,
+          sha: file.sha,
+          download_url: file.download_url,
+          page: pageDoc,
+          isDraft: Boolean(pageDoc.draft),
+        });
+      }
+    } catch (e) {
+      console.warn(`Failed to parse landing page ${file.name}:`, e);
+      pages.push({
+        name: file.name,
+        slug: file.name.replace(/\.json$/, ''),
+        path: file.path,
+        sha: file.sha,
+        isDraft: false,
+      });
+    }
+  }
+
+  return pages;
+}
+
+/**
+ * Commit an Easyblocks landing page JSON to GitHub
+ */
+export async function commitLandingPageToGitHub(
+  config: GitHubConfig,
+  slug: string,
+  landingPage: LandingPageDocument,
+  existingSha?: string
+): Promise<{ sha: string; commit: any }> {
+  const { owner, repo, branch, pagesPath = 'src/content/pages', token } = config;
+  const cleanPath = pagesPath.replace(/^\/+|\/+$/g, '');
+  const cleanSlug = slug.replace(/\.json$/, '');
+  const filename = `${cleanSlug}.json`;
+  const fullPath = `${cleanPath}/${filename}`;
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${fullPath}`;
+
+  const jsonContent = JSON.stringify(landingPage, null, 2);
+  const base64Content = utf8ToBase64(jsonContent);
+
+  // Drafts include [skip ci] so Cloudflare Pages avoids rebuilds
+  // Publishing explicitly OMITS [skip ci] to trigger production build
+  const commitMessage = landingPage.draft
+    ? `Draft landing page: ${landingPage.title} [skip ci]`
+    : `Publish landing page: ${landingPage.title}`;
+
+  const payload: any = {
+    message: commitMessage,
+    content: base64Content,
+    branch: branch,
+  };
+
+  if (existingSha) {
+    payload.sha = existingSha;
+  } else {
+    try {
+      const checkRes = await fetch(url + `?ref=${branch}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/vnd.github.v3+json',
+        },
+      });
+      if (checkRes.ok) {
+        const existingData = await checkRes.json();
+        if (existingData.sha) {
+          payload.sha = existingData.sha;
+        }
+      }
+    } catch {
+      // New file
+    }
+  }
+
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const errorBody = await res.text();
+    throw new Error(`GitHub landing page commit failed (${res.status}): ${errorBody}`);
+  }
+
+  return await res.json();
+}
+
+/**
+ * Delete a landing page from GitHub
+ */
+export async function deleteLandingPageFromGitHub(
+  config: GitHubConfig,
+  slug: string,
+  sha: string
+): Promise<void> {
+  const { owner, repo, branch, pagesPath = 'src/content/pages', token } = config;
+  const cleanPath = pagesPath.replace(/^\/+|\/+$/g, '');
+  const cleanSlug = slug.replace(/\.json$/, '');
+  const fullPath = `${cleanPath}/${cleanSlug}.json`;
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${fullPath}`;
+
+  const res = await fetch(url, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      message: `Delete landing page: ${cleanSlug} [skip ci]`,
+      sha: sha,
+      branch: branch,
+    }),
+  });
+
+  if (!res.ok) {
+    const errorBody = await res.text();
+    throw new Error(`Failed to delete landing page (${res.status}): ${errorBody}`);
   }
 }

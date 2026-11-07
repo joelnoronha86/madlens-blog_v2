@@ -1,0 +1,70 @@
+---
+interface Swatch {
+  name: string;
+  binomial?: string;
+  color: string;
+  texture?: string;
+}
+
+interface Props {
+  heading?: string;
+  description?: string;
+  swatches?: Swatch[];
+}
+
+const {
+  heading = 'Living Earth Swatches',
+  description = 'Natural pigments chelated and dyed on handspun fibers.',
+  swatches = [
+    { name: 'Indigo Deep', binomial: 'Indigofera tinctoria', color: '#2C4251', texture: 'linen' },
+    { name: 'Madder Terracotta', binomial: 'Rubia tinctorum', color: '#943D36', texture: 'wool' },
+    { name: 'Weld Ochre', binomial: 'Reseda luteola', color: '#C98E3A', texture: 'silk' },
+    { name: 'Botanical Sage', binomial: 'Salvia officinalis', color: '#5B7065', texture: 'linen' },
+  ],
+} = Astro.props;
+---
+
+<section class="py-16 bg-parchment-deep/30 border-b border-parchment-border">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <div class="text-center max-w-2xl mx-auto mb-12">
+      <div class="font-mono text-xs uppercase tracking-widest text-sage-botanical mb-1 font-bold">
+        ✦ TEXTILE PIGMENT CARTOGRAPHY ✦
+      </div>
+      <h2 class="font-heading text-3xl sm:text-4xl text-indigo-deep">
+        {heading}
+      </h2>
+      {description && (
+        <p class="font-body text-indigo-deep/80 text-base mt-2">
+          {description}
+        </p>
+      )}
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
+      {swatches.map((swatch) => (
+        <div class="bg-parchment-light border border-parchment-border p-5 rounded-sm text-center flex flex-col items-center shadow-sm hover:shadow-md transition-shadow">
+          <div
+            class="w-24 h-24 sm:w-28 sm:h-28 swatch-pinked shadow-md mb-3"
+            style={`background-color: ${swatch.color};`}
+            title={swatch.name}
+          >
+            <div class="w-full h-full opacity-25 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:4px_4px]"></div>
+          </div>
+          <div class="font-mono text-xs font-bold text-indigo-deep uppercase tracking-wider">
+            {swatch.name}
+          </div>
+          {swatch.binomial && (
+            <div class="font-heading italic text-xs text-sage-botanical mt-0.5">
+              {swatch.binomial}
+            </div>
+          )}
+          <div class="font-mono text-[10px] text-ink-muted mt-1 uppercase">
+            {swatch.color} &bull; {swatch.texture || 'linen'}
+          </div>
+        </div>
+      ))}
+    </div>
+
+  </div>
+</section>

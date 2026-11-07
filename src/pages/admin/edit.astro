@@ -30,6 +30,9 @@ const postsDataJson = JSON.stringify(
             <span id="draft-status-pill" class="px-2 py-0.5 rounded text-[10px] bg-amber-100 text-amber-800 border border-amber-300 font-bold">
               EDITING
             </span>
+            <span class="px-2 py-0.5 rounded text-[10px] bg-parchment-deep text-sage-botanical border border-parchment-border font-mono hidden sm:inline-block" title="Draft commits include [skip ci] so Cloudflare Pages will not build until published.">
+              CI: SKIP ON DRAFT
+            </span>
           </div>
           <h1 id="page-heading" class="font-heading text-3xl sm:text-4xl text-indigo-deep">
             Edit Monograph
@@ -598,8 +601,8 @@ const postsDataJson = JSON.stringify(
 
         showToast(
           isDraft
-            ? `Draft successfully updated on GitHub with draft: true!`
-            : `Updated and published to GitHub! Cloudflare Pages build triggered.`,
+            ? `Draft saved to GitHub with [skip ci]! Cloudflare Pages build skipped.`
+            : `Updated and published to GitHub! Cloudflare Pages rebuild triggered.`,
           'success'
         );
 

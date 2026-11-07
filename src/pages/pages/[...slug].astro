@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EasyblocksRenderer from '../../components/easyblocks/EasyblocksRenderer.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const pages = await getCollection('pages', ({ data }) => {
+    return data.draft !== true;
+  });
+
+  return pages.map((page) => ({
+    params: { slug: page.data.slug || page.id.replace(/\.json$/, '') },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props;
+const { data } = page;
+---
+
+<BaseLayout
+  title={`${data.title} | Geographies of Natural Dyes`}
+  description={data.description}
+>
+  <div class="easyblocks-landing-page">
+    <EasyblocksRenderer blocks={data.blocks} />
+  </div>
+</BaseLayout>

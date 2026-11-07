@@ -1,0 +1,64 @@
+---
+interface Props {
+  name?: string;
+  commonName?: string;
+  coordinates?: string;
+  origin?: string;
+  chemical?: string;
+  notes?: string;
+}
+
+const {
+  name = 'Indigofera tinctoria',
+  commonName = 'True Indigo',
+  coordinates = "25°12' N, 68°51' E",
+  origin = 'Indus Valley Archive',
+  chemical = 'Indigotin (C16H10N2O2)',
+  notes = 'Requires anaerobic bacterial reduction to soluble leuco-indigo followed by aerial oxidation.',
+} = Astro.props;
+---
+
+<section class="py-12 bg-parchment-base border-b border-parchment-border">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="border border-parchment-border bg-parchment-light p-6 sm:p-8 rounded-sm shadow-sm">
+      <div class="flex items-center justify-between border-b border-parchment-border pb-3 mb-6">
+        <span class="font-mono text-xs uppercase tracking-widest text-sage-botanical font-bold">
+          BOTANICAL SPECIMEN DOSSIER
+        </span>
+        <span class="font-mono text-xs text-madder-red font-bold">
+          {coordinates}
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <div>
+          <h3 class="font-heading text-3xl text-indigo-deep font-semibold italic">
+            {name}
+          </h3>
+          {commonName && (
+            <p class="font-heading text-lg text-sage-botanical mt-0.5">
+              {commonName}
+            </p>
+          )}
+
+          <dl class="mt-4 space-y-2 font-mono text-xs text-indigo-deep">
+            <div>
+              <dt class="text-[11px] text-sage-botanical uppercase">ORIGIN ARCHIVE:</dt>
+              <dd class="font-bold">{origin}</dd>
+            </div>
+            <div>
+              <dt class="text-[11px] text-sage-botanical uppercase">CHROMOPHORE:</dt>
+              <dd class="font-bold text-indigo-dark">{chemical}</dd>
+            </div>
+          </dl>
+        </div>
+
+        {notes && (
+          <div class="bg-parchment-base p-5 rounded border border-parchment-border/70 font-body text-sm text-indigo-deep/90 leading-relaxed italic">
+            "{notes}"
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</section>

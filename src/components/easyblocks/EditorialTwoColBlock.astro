@@ -1,0 +1,73 @@
+---
+interface Props {
+  heading?: string;
+  subheading?: string;
+  col1?: string;
+  col2?: string;
+  image?: string;
+  caption?: string;
+}
+
+const {
+  heading = 'Editorial & Methodology',
+  subheading = 'Blending molecular chemistry with traditional textile craft',
+  col1 = '',
+  col2 = '',
+  image = '/images/studio-researcher.jpeg',
+  caption = 'FIG. 1: Field observations in the studio',
+} = Astro.props;
+---
+
+<section class="py-16 bg-parchment-light border-b border-parchment-border">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <div class="max-w-3xl mb-10">
+      <h2 class="font-heading text-3xl sm:text-4xl md:text-5xl text-indigo-deep">
+        {heading}
+      </h2>
+      {subheading && (
+        <p class="font-heading italic text-lg sm:text-xl text-sage-botanical mt-2">
+          {subheading}
+        </p>
+      )}
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+      
+      {image && (
+        <div class="lg:col-span-5">
+          <figure class="border border-parchment-border p-2 bg-parchment-base rounded-sm shadow-sm">
+            <img
+              src={image}
+              alt={heading}
+              class="w-full h-auto object-cover rounded-sm"
+              loading="lazy"
+            />
+            {caption && (
+              <figcaption class="mt-2 font-mono text-xs text-sage-botanical uppercase tracking-wider text-center">
+                {caption}
+              </figcaption>
+            )}
+          </figure>
+        </div>
+      )}
+
+      <div class={image ? 'lg:col-span-7 space-y-6' : 'lg:col-span-12 space-y-6'}>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-indigo-deep/90 font-body text-base leading-relaxed">
+          {col1 && (
+            <div class="drop-cap">
+              <p>{col1}</p>
+            </div>
+          )}
+          {col2 && (
+            <div>
+              <p>{col2}</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>

@@ -27,37 +27,48 @@ Designed around the visual atmosphere of **field notebooks, antique botanical he
 
 * **Static Site Generator:** [Astro 5](https://astro.build) (Static output, zero runtime server overhead)
 * **Styling:** [Tailwind CSS](https://tailwindcss.com) with `@tailwindcss/typography`
-* **CMS & Editor:** Browser-based [Tiptap](https://tiptap.dev) WYSIWYG editor with rich UI controls
-* **Git-Backed Storage:** All articles are stored as Markdown (`.md`) files in `src/content/posts/` with YAML frontmatter
-* **Continuous Deployment:** Free [Cloudflare Pages](https://pages.cloudflare.com) detects Git commits and deploys production builds worldwide in 30–60 seconds
+* **Dual Editors:**
+  * **[Tiptap](https://tiptap.dev) Editor:** Specialized for long-form research monographs, laboratory observations, and poetic essays with drop caps and formula blocks.
+  * **[Easyblocks](https://github.com/easyblockshq/easyblocks) Visual Builder:** Specialized for modular, custom landing pages, symposia, and exhibition pages using No-Code components.
+* **Smart CI Skip Policy:** Rapid autosaves and draft saves commit to GitHub with `[skip ci]`, preventing Cloudflare Pages from rebuilding during writing. Rebuilds trigger **strictly when the Publish button is clicked**.
+* **Git-Backed Flat-File Storage:** 
+  * Articles stored as Markdown (`.md`) in `src/content/posts/`
+  * Landing pages stored as Easyblocks JSON (`.json`) in `src/content/pages/`
+* **Continuous Deployment:** Free [Cloudflare Pages](https://pages.cloudflare.com) detects production Git commits and deploys in 30–60 seconds.
 
 ---
 
-## ✦ How the Writer Admin Studio Works
+## ✦ Editorial Workflow & Smart CI Rebuild Control
 
-The entire administration and editorial suite runs **directly in the client browser** with no server or database needed:
+### Why Cloudflare Pages Does Not Rebuild on Draft Saves
+Cloudflare Pages natively recognizes git commit message flags such as `[skip ci]`, `[ci skip]`, and `[CF-Pages-Skip]`:
+1. **While editing in Tiptap or Easyblocks:** Changes are instantly autosaved to the browser's `localStorage` in $0\text{ms}$.
+2. **Clicking "Save Draft":** Commits to GitHub with commit message `Draft: <title> [skip ci]`. Cloudflare Pages inspects the commit, detects the flag, and **skips the build entirely**. You can make dozens of rapid saves without consuming Cloudflare build minutes.
+3. **Clicking "Publish to Production":** Commits to GitHub **WITHOUT** `[skip ci]` (e.g. `Publish to production: <title>`). Cloudflare Pages immediately triggers the static build, updating your live production website in 30–60 seconds.
 
-### 1. Accessing the Dashboard (`/admin`)
-Navigate to `https://yourblog.com/admin` (or `http://localhost:4321/admin` locally).
-* **GitHub Integration:** Click **"GitHub Settings"** to link your repository using a fine-grained or classic GitHub Personal Access Token (PAT) with `repo` permissions. Your token is stored securely in your browser's `localStorage`.
-* **Repository Overview:** The dashboard fetches `src/content/posts/` via the GitHub API, categorizing posts into **Published** vs **Draft** status with real-time stats and search filters.
-* **Offline / Local Mode:** If GitHub is not yet connected, you can still author, edit, and preview articles locally.
+---
 
-### 2. Composing & Saving a Draft (`/admin/new`)
-* Open the Tiptap Studio at `/admin/new`.
-* Fill out the structured metadata: **Title**, **Slug**, **Subtitle**, **Excerpt**, **Botanical Specimen**, **Coordinates**, and **Tags**.
-* Write in the Tiptap editor with full formatting controls (Headings H1–H3, bold, italic, strikethrough, blockquotes, code blocks, lists, horizontal rules, and image insertion).
-* Toggle **"Show Split Preview"** to view a live, real-time mirror of the exact published layout side-by-side with your writing.
-* Clicking **"Save Draft"** commits a new file (e.g. `src/content/posts/my-post.md`) to your GitHub repository with `draft: true`.
+## ✦ Dual Studio Suite
 
-### 3. Publishing to Production
-* When your essay is complete, click **"Publish to Production"**.
-* The editor updates the frontmatter in GitHub to `draft: false`.
-* Cloudflare Pages automatically detects the Git commit and rebuilds the site in 30–60 seconds.
+### 1. Long-Form Writing Studio (Tiptap) &mdash; `/admin/new` & `/admin/edit`
+* For narrative essays, chemical analysis of vat fermentations, and field notes.
+* Full Tiptap UI toolbar (Bold, Italic, Headings H1–H3, Lists, Blockquotes, Images, Links).
+* Side-by-side split preview mirroring the exact published editorial layout.
+* Draft preview route: `/admin/preview/[...slug]`.
 
-### 4. Draft Previews (`/admin/preview/[...slug]`)
-* In production, the public `/posts/[...slug]` routes render **only published articles** (`draft: false`).
-* The dedicated preview engine under `/admin/preview/[...slug]` renders **both drafts and published articles** with an alert banner and direct link to resume editing in Tiptap.
+### 2. Custom Landing Pages Studio (Easyblocks) &mdash; `/admin/landing-pages/new` & `/admin/landing-pages/edit`
+* For custom symposia, workshops, event announcements, and interactive pigment portfolios.
+* Component Palette:
+  * **HeroSectionBlock:** Main banner, title, subtitle, CTA button, and flat-lay image.
+  * **EditorialTwoColBlock:** 2-column layout with drop cap text and studio figure image.
+  * **SwatchAtlasBlock:** Grid of authentic fabric swatches with binomial Latin names.
+  * **SpecimenShowcaseBlock:** Chemical and geographic specimen card.
+  * **QuoteCalloutBlock:** Research quotes and journal citations.
+  * **GalleryTriptychBlock:** 3-card photo expedition gallery.
+  * **NewsletterDispatchBlock:** Postal dispatch subscription call-to-action.
+  * **RawMarkdownBlock:** Freeform markdown or raw HTML section.
+* Move blocks up/down, duplicate, delete, and live edit properties in the Inspector sidebar.
+* Draft preview route: `/admin/preview/pages/[...slug]`.
 
 ---
 

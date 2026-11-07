@@ -1,0 +1,34 @@
+---
+interface Props {
+  quote?: string;
+  author?: string;
+  affiliation?: string;
+}
+
+const {
+  quote = 'When an indigo vat breathes, it is not metaphor—it is billions of anaerobic bacteria reducing insoluble blue into liquid gold.',
+  author = 'Dr. E. Archer',
+  affiliation = 'Archaeological Chemistry & Textile Conservation',
+} = Astro.props;
+---
+
+<section class="py-16 bg-parchment-deep/40 border-b border-parchment-border">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-5">
+    <div class="font-heading text-4xl text-sage-botanical">
+      &ldquo;
+    </div>
+    <blockquote class="font-heading italic text-2xl sm:text-3xl lg:text-4xl text-indigo-deep leading-snug max-w-3xl mx-auto">
+      {quote}
+    </blockquote>
+    <div class="pt-2">
+      <div class="font-mono text-xs uppercase tracking-widest text-indigo-deep font-bold">
+        {author}
+      </div>
+      {affiliation && (
+        <div class="font-mono text-[11px] text-sage-botanical mt-0.5">
+          {affiliation}
+        </div>
+      )}
+    </div>
+  </div>
+</section>

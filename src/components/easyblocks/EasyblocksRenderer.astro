@@ -1,0 +1,51 @@
+---
+import HeroSectionBlock from './HeroSectionBlock.astro';
+import EditorialTwoColBlock from './EditorialTwoColBlock.astro';
+import SwatchAtlasBlock from './SwatchAtlasBlock.astro';
+import SpecimenShowcaseBlock from './SpecimenShowcaseBlock.astro';
+import QuoteCalloutBlock from './QuoteCalloutBlock.astro';
+import NewsletterDispatchBlock from './NewsletterDispatchBlock.astro';
+import GalleryTriptychBlock from './GalleryTriptychBlock.astro';
+import RawMarkdownBlock from './RawMarkdownBlock.astro';
+
+interface Block {
+  id: string;
+  type: string;
+  props: Record<string, any>;
+}
+
+interface Props {
+  blocks: Block[];
+}
+
+const { blocks = [] } = Astro.props;
+---
+
+<div class="easyblocks-page-root">
+  {blocks.map((block) => {
+    switch (block.type) {
+      case 'HeroSectionBlock':
+        return <HeroSectionBlock {...block.props} />;
+      case 'EditorialTwoColBlock':
+        return <EditorialTwoColBlock {...block.props} />;
+      case 'SwatchAtlasBlock':
+        return <SwatchAtlasBlock {...block.props} />;
+      case 'SpecimenShowcaseBlock':
+        return <SpecimenShowcaseBlock {...block.props} />;
+      case 'QuoteCalloutBlock':
+        return <QuoteCalloutBlock {...block.props} />;
+      case 'NewsletterDispatchBlock':
+        return <NewsletterDispatchBlock {...block.props} />;
+      case 'GalleryTriptychBlock':
+        return <GalleryTriptychBlock {...block.props} />;
+      case 'RawMarkdownBlock':
+        return <RawMarkdownBlock {...block.props} />;
+      default:
+        return (
+          <div class="py-8 bg-amber-50 text-amber-900 border border-amber-300 p-4 text-center font-mono text-xs">
+            Unknown block component: <code>{block.type}</code>
+          </div>
+        );
+    }
+  })}
+</div>

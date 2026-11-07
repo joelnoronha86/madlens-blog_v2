@@ -1,0 +1,98 @@
+{
+  "title": "International Natural Dyes Symposium & Field Laboratory 2026",
+  "slug": "symposium-2026",
+  "description": "A 5-day gathering of archaeological chemists, master dyers, and textile artists in the Aegean.",
+  "draft": false,
+  "updatedAt": "2026-11-07T01:30:00Z",
+  "blocks": [
+    {
+      "id": "blk-hero-1",
+      "type": "HeroSectionBlock",
+      "props": {
+        "title": "The Chemistry of Ancient Color: Field Symposium 2026",
+        "subtitle": "A gathering of archaeological chemists, master dyers, and textile artists in the Aegean",
+        "tagline": "OCTOBER 14-19, 2026 • ISLAND OF KOS & ATHENS",
+        "image": "/images/hero-field-notebook-flatlay.jpeg",
+        "ctaText": "Register for Field Lab",
+        "ctaLink": "#register",
+        "accentColor": "#943D36"
+      }
+    },
+    {
+      "id": "blk-editorial-1",
+      "type": "EditorialTwoColBlock",
+      "props": {
+        "heading": "Bridging Spectrometry & Traditional Vats",
+        "subheading": "Five days of immersive field research, botanical foraging, and anaerobic fermentation",
+        "col1": "Natural dyes represent one of humanity's oldest and most sophisticated biotechnologies. Over five days, researchers and artists will bridge the divide between laboratory science and living studio traditions.",
+        "col2": "Participants will engage in chromatographic analysis of wild pigments, explore historic fermentation vats with date and lime reductions, and dye unbleached linen with native Mediterranean flora.",
+        "image": "/images/studio-researcher.jpeg",
+        "caption": "FIG. 1: Dr. E. Archer demonstrating vat reduction chemistry"
+      }
+    },
+    {
+      "id": "blk-swatches-1",
+      "type": "SwatchAtlasBlock",
+      "props": {
+        "heading": "Symposium Pigment Portfolio",
+        "description": "Field specimens to be analyzed and dyed on handspun organic flax linen.",
+        "swatches": [
+          {
+            "name": "Indus Indigo",
+            "binomial": "Indigofera tinctoria",
+            "color": "#2C4251",
+            "texture": "linen"
+          },
+          {
+            "name": "Anatolian Madder",
+            "binomial": "Rubia tinctorum",
+            "color": "#943D36",
+            "texture": "wool"
+          },
+          {
+            "name": "Provence Weld",
+            "binomial": "Reseda luteola",
+            "color": "#C98E3A",
+            "texture": "silk"
+          },
+          {
+            "name": "Aegean Sage",
+            "binomial": "Salvia officinalis + Fe",
+            "color": "#5B7065",
+            "texture": "linen"
+          }
+        ]
+      }
+    },
+    {
+      "id": "blk-specimen-1",
+      "type": "SpecimenShowcaseBlock",
+      "props": {
+        "name": "Salvia fruticosa & Quercus infectoria",
+        "commonName": "Greek Mountain Sage & Oak Gall",
+        "coordinates": "36°50' N, 27°18' E",
+        "origin": "Aegean Field Station Archive",
+        "chemical": "Ferrous Gallotannate Complex",
+        "notes": "Collected along Aegean coastal ridges for high tannin and rosmarinic acid yield."
+      }
+    },
+    {
+      "id": "blk-quote-1",
+      "type": "QuoteCalloutBlock",
+      "props": {
+        "quote": "A natural dye is not a static color; it is a geographic signature of soil, water, and human hands.",
+        "author": "Dr. E. Archer",
+        "affiliation": "Director, Natural Dye Herbarium & Fiber Laboratory"
+      }
+    },
+    {
+      "id": "blk-newsletter-1",
+      "type": "NewsletterDispatchBlock",
+      "props": {
+        "heading": "Register for Symposium Updates & Syllabus",
+        "subheading": "Receive early registration access, laboratory syllabus, and lodging details.",
+        "buttonText": "Request Prospectus"
+      }
+    }
+  ]
+}
